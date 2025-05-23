@@ -21,6 +21,13 @@ android {
     }
 
     buildTypes {
+        // To test oss-license without release mode
+        create("fakeDebug") {
+            initWith(getByName("debug"))
+            matchingFallbacks += listOf("debug")
+            isDebuggable = false
+        }
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -48,11 +55,13 @@ secrets {
 }
 
 dependencies {
+    implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)

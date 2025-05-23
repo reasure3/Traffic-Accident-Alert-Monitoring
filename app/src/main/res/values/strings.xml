@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Traffic Accident Alert and Monitoring</string>
+    <string name="label_hotspot">Hotspot</string>
+    <string name="label_notification">Notification</string>
+    <string name="label_edit_condition">Edit Condition</string>
+    <string name="label_trends">Trends</string>
+    <string name="label_admin_setting">Admin</string>
+    <string name="label_license">Licenses</string>
 </resources>

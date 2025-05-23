@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">교통사고 분석 및 알림 시스템</string>
+    <string name="label_hotspot">핫스팟 조회</string>
+    <string name="label_notification">실시간 알림</string>
+    <string name="label_edit_condition">알림 조건 수정</string>
+    <string name="label_trends">트렌드 분석</string>
+    <string name="label_admin_setting">관리자</string>
+    <string name="label_license">라이선스</string>
 </resources>
