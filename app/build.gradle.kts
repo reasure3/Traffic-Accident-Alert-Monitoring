@@ -1,9 +1,12 @@
+import com.github.jk1.license.render.InventoryMarkdownReportRenderer
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.android.gms.oss-licenses-plugin")
+    id("com.github.jk1.dependency-license-report") version "2.9"
 }
 
 android {
@@ -86,4 +89,9 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+licenseReport {
+    configurations = arrayOf("releaseRuntimeClasspath")
+    renderers = arrayOf(InventoryMarkdownReportRenderer())
 }
