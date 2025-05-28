@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -42,6 +44,7 @@ import com.swengineering.team1.traffic_accident.screen.component.SearchBar
 @Composable
 fun HotspotScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var showPermissionDialog by remember {
         mutableStateOf(true)
     }
@@ -56,12 +59,19 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
 
     if (allRequiredPermission) {
         Column(modifier = modifier.fillMaxSize()) {
-            SearchBar { query ->
-                val latLng = MapSearchController.searchLocation(context, query)
-                latLng?.let {
-                    MapSearchController.selectLocation(it)
+            SearchBar (
+                onSearch = { query ->
+                    coroutineScope.launch {
+                        val latLng = MapSearchController.searchLocation(context, query)
+                        latLng?.let {
+                            MapSearchController.selectLocation(it)
+                        }
+                    }
+                },
+                onClearSearch = {
+                    MapSearchController.clearSelectedLocation()
                 }
-            }
+            )
             ShowMap(Modifier.weight(1f))
         }
     } else if (showPermissionDialog) {
