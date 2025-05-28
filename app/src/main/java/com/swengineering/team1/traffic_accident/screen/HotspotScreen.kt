@@ -2,6 +2,8 @@ package com.swengineering.team1.traffic_accident.screen
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
+import android.annotation.SuppressLint
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -14,15 +16,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.LaunchedEffect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.swengineering.team1.traffic_accident.controller.MapSearchController
+import com.swengineering.team1.traffic_accident.controller.LocationController
+import com.swengineering.team1.traffic_accident.model.MapLocationModel
+import com.swengineering.team1.traffic_accident.screen.component.SearchBar
+
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Preview
@@ -40,12 +50,20 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
         Manifest.permission.ACCESS_FINE_LOCATION
     )
     val permissionState = rememberMultiplePermissionsState(permissions = permissions)
-    // 설정한 permission List 중 첫번째 권한이 현재 포함되어 있는지
+    // 모든 권한이 승인되었는지 판단
     val allRequiredPermission =
-        permissionState.revokedPermissions.none { it.permission in permissions.first() }
+        permissionState.revokedPermissions.none { it.permission in permissions }
 
     if (allRequiredPermission) {
-        ShowMap(modifier)
+        Column(modifier = modifier.fillMaxSize()) {
+            SearchBar { query ->
+                val latLng = MapSearchController.searchLocation(context, query)
+                latLng?.let {
+                    MapSearchController.selectLocation(it)
+                }
+            }
+            ShowMap(Modifier.weight(1f))
+        }
     } else if (showPermissionDialog) {
         PermissionDialog(permissionState) {
             showPermissionDialog = it
@@ -57,17 +75,42 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
 
 // API 키를 안주면 빈지도로 나옴
 // API 키 설정 필수
+@SuppressLint("MissingPermission", "UnrememberedMutableState")
 @Composable
 fun ShowMap(modifier: Modifier = Modifier) {
-    val latLng = LatLng(0.0, 0.0)
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(latLng, 17f)
+    val context = LocalContext.current
+    val initialLatLng by MapLocationModel.initialLocation
+    val selectedLatLng by MapLocationModel.selectedLocation
+    val cameraPositionState = rememberCameraPositionState()
+
+    // 최초 실행 시 현재 위치로 초기화
+    LaunchedEffect(Unit) {
+        if (initialLatLng == null) {
+            val current = LocationController.getCurrentLocation(context)
+            current?.let {
+                MapLocationModel.initialLocation.value = it
+                cameraPositionState.move(
+                    CameraUpdateFactory.newLatLngZoom(it, 17f)
+                )
+            }
+        }
     }
+
+    // 선택된 위치가 있을 경우 카메라 이동
+    LaunchedEffect(selectedLatLng) {
+        selectedLatLng?.let {
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(it, 17f),
+                durationMs = 1000
+            )
+        }
+    }
+
     val uiSettings = remember {
-        MapUiSettings(myLocationButtonEnabled = true)
+        MapUiSettings(myLocationButtonEnabled = true)               // 지도 우측 상단에 현재 위치 버튼 표시
     }
     val properties by remember {
-        mutableStateOf(MapProperties(isMyLocationEnabled = true))
+        mutableStateOf(MapProperties(isMyLocationEnabled = true))   // 현재 위치에 파란 점 표시
     }
     GoogleMap(
         modifier = modifier,
@@ -75,7 +118,13 @@ fun ShowMap(modifier: Modifier = Modifier) {
         properties = properties,
         uiSettings = uiSettings
     ) {
-        // code
+        // 검색으로 선택된 위치만 마커로 표시
+        selectedLatLng?.let {
+            Marker(
+                state = MarkerState(position = it),
+                title = "선택한 위치"
+            )
+        }
     }
 }
 
