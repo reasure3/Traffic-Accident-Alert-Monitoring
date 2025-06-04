@@ -9,16 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun AccidentSummaryPanel(onFilterClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Button(onClick = onFilterClick) {
-            Text("필터")
-        }
+fun AccidentFilterPanel(onFilterClick: () -> Unit) {
+    Button(onClick = onFilterClick) {
+        Text("필터")
     }
 }
