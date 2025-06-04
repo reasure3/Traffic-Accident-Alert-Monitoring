@@ -2,12 +2,13 @@ package com.swengineering.team1.traffic_accident.screen
 
 import android.Manifest
 import androidx.annotation.RequiresPermission
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.AlertDialog
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,21 +20,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.MultiplePermissionsState
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.swengineering.team1.traffic_accident.controller.MapSearchController
-import com.swengineering.team1.traffic_accident.controller.LocationController
+import com.swengineering.team1.traffic_accident.model.AccidentModel
+import com.swengineering.team1.traffic_accident.model.MapFilterModel
 import com.swengineering.team1.traffic_accident.model.MapLocationModel
-import com.swengineering.team1.traffic_accident.screen.component.SearchBar
-
+import com.swengineering.team1.traffic_accident.view.AccidentSummaryPanel
+import com.swengineering.team1.traffic_accident.view.FilterDialog
+import com.swengineering.team1.traffic_accident.view.SearchBar
+import com.swengineering.team1.traffic_accident.screen.view.ShowMapView
+import com.swengineering.team1.traffic_accident.service.LocationService
+import com.swengineering.team1.traffic_accident.service.MapSearchService
+import com.swengineering.team1.traffic_accident.view.PermissionDeniedView
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -52,58 +55,20 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
         Manifest.permission.ACCESS_COARSE_LOCATION,
         Manifest.permission.ACCESS_FINE_LOCATION
     )
+
     val permissionState = rememberMultiplePermissionsState(permissions = permissions)
-    // 모든 권한이 승인되었는지 판단
-    val allRequiredPermission =
-        permissionState.revokedPermissions.none { it.permission in permissions }
+    val showFilterDialog = remember { mutableStateOf(false) }
 
-    if (allRequiredPermission) {
-        Column(modifier = modifier.fillMaxSize()) {
-            SearchBar (
-                onSearch = { query ->
-                    coroutineScope.launch {
-                        val latLng = MapSearchController.searchLocation(context, query)
-                        latLng?.let {
-                            MapSearchController.selectLocation(it)
-                        }
-                    }
-                },
-                onClearSearch = {
-                    MapSearchController.clearSelectedLocation()
-                }
-            )
-            ShowMap(Modifier.weight(1f))
-        }
-    } else if (showPermissionDialog) {
-        PermissionDialog(permissionState) {
-            showPermissionDialog = it
-        }
-    } else {
-        Text("이미 권한이 거부되었습니다. 설정에서 직접 권한 설정을 해주세요", modifier)
-    }
-}
-
-// API 키를 안주면 빈지도로 나옴
-// API 키 설정 필수
-@SuppressLint("MissingPermission", "UnrememberedMutableState")
-@Composable
-fun ShowMap(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
-    val initialLatLng by MapLocationModel.initialLocation
-    val selectedLatLng by MapLocationModel.selectedLocation
+    val selectedLatLng by MapLocationModel.selectedLocation.collectAsState()
     val cameraPositionState = rememberCameraPositionState()
 
     // 최초 실행 시 현재 위치로 초기화
     LaunchedEffect(Unit) {
-        if (initialLatLng == null) {
-            val current = LocationController.getCurrentLocation(context)
-            current?.let {
-                MapLocationModel.initialLocation.value = it
-                cameraPositionState.move(
-                    CameraUpdateFactory.newLatLngZoom(it, 17f)
-                )
-            }
-        }
+        val location = LocationService.getCurrentLocation(context)
+        val initLocation = location ?: LocationService.getDefaultLocation()
+
+        MapLocationModel.setInitialLocation(initLocation)
+        cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(initLocation, 17f))
     }
 
     // 선택된 위치가 있을 경우 카메라 이동
@@ -116,56 +81,89 @@ fun ShowMap(modifier: Modifier = Modifier) {
         }
     }
 
-    val uiSettings = remember {
-        MapUiSettings(myLocationButtonEnabled = true)               // 지도 우측 상단에 현재 위치 버튼 표시
-    }
-    val properties by remember {
-        mutableStateOf(MapProperties(isMyLocationEnabled = true))   // 현재 위치에 파란 점 표시
-    }
-    GoogleMap(
-        modifier = modifier,
-        cameraPositionState = cameraPositionState,
-        properties = properties,
-        uiSettings = uiSettings
-    ) {
-        // 검색으로 선택된 위치만 마커로 표시
-        selectedLatLng?.let {
-            Marker(
-                state = MarkerState(position = it),
-                title = "선택한 위치"
+    val filterState by MapFilterModel.filterState.collectAsState()
+    val filteredData = AccidentModel.getFilteredAccidents(
+        severityList = filterState.severityList,
+        weatherList = filterState.weatherList
+    )
+
+    // 모든 권한이 승인되었는지 판단
+    val allRequiredPermission =
+        permissionState.revokedPermissions.none { it.permission in permissions }
+
+    if (allRequiredPermission) {
+        Scaffold(
+            topBar = {
+                Column (modifier = Modifier.fillMaxSize().padding(32.dp)){
+                    SearchBarController(
+                        onSearch = { query ->
+                            coroutineScope.launch {
+                                val latLng = MapSearchService.searchLocation(context, query)
+                                latLng?.let { MapLocationModel.setSelectedLocation(it) }
+                            }
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    AccidentSummaryPanel(onFilterClick = {showFilterDialog.value = true})
+                }
+            },
+            content = { innerPadding ->
+                ShowMapView(
+                    cameraPositionState = cameraPositionState,
+                    accidents = filteredData,
+                    selectedLocation = selectedLatLng,
+                    onMyLocationClick = {
+                        coroutineScope.launch {
+                            val location = LocationService.getCurrentLocation(context)
+                                ?: LocationService.getDefaultLocation()
+
+                            cameraPositionState.animate(
+                                update = CameraUpdateFactory.newLatLngZoom(location, 17f),
+                                durationMs = 1000
+                            )
+                        }
+                    }
+                )
+            }
+        )
+
+        if (showFilterDialog.value) {
+            FilterDialog(
+                filter = filterState,
+                onToggleSeverity = { MapFilterModel.toggleSeverity(it) },
+                onToggleWeather = { MapFilterModel.toggleWeather(it) },
+                onReset = { MapFilterModel.reset() },
+                onDismiss = { showFilterDialog.value = false }
             )
         }
+    } else if (showPermissionDialog) {
+        PermissionDeniedView(
+            onPermissionRequest = {
+                showPermissionDialog = false
+                permissionState.launchMultiplePermissionRequest()
+            },
+            onDismiss = { showPermissionDialog = false }
+        )
+    } else {
+        Text("이미 권한이 거부되었습니다. 설정에서 직접 권한 설정을 해주세요", modifier)
     }
 }
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun PermissionDialog(
-    permissionState: MultiplePermissionsState,
-    showPermissionDialog: (Boolean) -> Unit
-){
-    AlertDialog(
-        onDismissRequest = { showPermissionDialog(false) },
-        title = {
-            Text(text = "위치정보 권한 요청")
+fun SearchBarController(
+    onSearch: (String) -> Unit
+) {
+    var searchText by remember { mutableStateOf(TextFieldValue("")) }
+
+    SearchBar(
+        searchText = searchText,
+        onSearchTextChanged = { searchText = it },
+        onSearchTriggered = {
+            onSearch(searchText.text)
         },
-        text = {
-            Text(text = "PlacePick 서비스를 원활하게 이용하기 위해 위치를 설정해보세요!")
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    showPermissionDialog(false)
-                    permissionState.launchMultiplePermissionRequest() // 위치권한 요청
-                }
-            ) {
-                Text(text = "확인")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { showPermissionDialog(false) }) {
-                Text(text = "취소")
-            }
+        onClearSearch = {
+            searchText = TextFieldValue("")
+            MapLocationModel.clearSelectedLocation()
         }
     )
 }

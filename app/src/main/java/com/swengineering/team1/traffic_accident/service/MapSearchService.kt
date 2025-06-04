@@ -1,16 +1,18 @@
-package com.swengineering.team1.traffic_accident.controller
+package com.swengineering.team1.traffic_accident.service
 
 import android.content.Context
 import android.location.Address
 import android.location.Geocoder
+import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.suspendCancellableCoroutine
+import java.util.Locale
+import android.location.Geocoder.GeocodeListener
 import android.os.Build
 import androidx.annotation.RequiresApi
-import com.google.android.gms.maps.model.LatLng
-import java.util.Locale
 import com.swengineering.team1.traffic_accident.model.MapLocationModel
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
-object MapSearchController {
+object MapSearchService {
 
     suspend fun searchLocation(context: Context, query: String): LatLng? {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -66,13 +68,5 @@ object MapSearchController {
                 null
             }
         }
-    }
-
-    fun selectLocation(newLocation: LatLng) {
-        MapLocationModel.selectedLocation.value = newLocation
-    }
-
-    fun clearSelectedLocation() {
-        MapLocationModel.selectedLocation.value = null
     }
 }
