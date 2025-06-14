@@ -1,42 +1,39 @@
 package com.swengineering.team1.traffic_accident.screen
 
 import android.Manifest
+import android.app.ActivityManager
+import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import com.swengineering.team1.traffic_accident.screen.util.PermissionAwareScreen
+import com.swengineering.team1.traffic_accident.service.LocationService
 
 @Preview
 @Composable
 fun NotificationScreen(modifier: Modifier = Modifier) {
     PermissionAwareScreen(
         onPermissionsGranted = {
-            Text("위치 권한이 활성화 되었습니다", modifier)
+            Column(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                LocationServiceController()
+            }
         },
         onPermissionsDenied = { requestPermission ->
             Column(
@@ -60,5 +57,43 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
         ).toTypedArray(),
         msgToSetting = "위치 권한을 항상 허용으로 바꿔주세요."
     )
+}
+
+@Composable
+fun LocationServiceController() {
+    val context = LocalContext.current
+
+    // 서비스 인텐트
+    val serviceIntent = remember {
+        Intent(context, LocationService::class.java)
+    }
+
+    // 버튼을 눌러 서비스 토글
+    Button(onClick = {
+        if (isServiceRunning(context, LocationService::class.java)) {
+            context.stopService(serviceIntent)
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.startForegroundService(serviceIntent)
+            } else {
+                context.startService(serviceIntent)
+            }
+        }
+    }) {
+        val label = if (isServiceRunning(context, LocationService::class.java)) {
+            "서비스 중지"
+        } else {
+            "서비스 시작"
+        }
+        Text(text = label)
+    }
+}
+
+// 서비스가 이미 실행 중인지 여부 확인 함수 (추가로 구현)
+fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
+    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    return manager.getRunningServices(Int.MAX_VALUE).any {
+        it.service.className == serviceClass.name
+    }
 }
 
