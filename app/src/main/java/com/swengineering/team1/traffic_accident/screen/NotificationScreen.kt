@@ -1,8 +1,6 @@
 package com.swengineering.team1.traffic_accident.screen
 
 import android.Manifest
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +11,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,7 +53,7 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
-            else null
+            else null,
         ).toTypedArray(),
         msgToSetting = "위치 권한을 항상 허용으로 바꿔주세요."
     )
@@ -62,6 +62,7 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
 @Composable
 fun LocationServiceController() {
     val context = LocalContext.current
+    val isRunning by LocationService.isRunning.collectAsState()
 
     // 서비스 인텐트
     val serviceIntent = remember {
@@ -70,7 +71,7 @@ fun LocationServiceController() {
 
     // 버튼을 눌러 서비스 토글
     Button(onClick = {
-        if (isServiceRunning(context, LocationService::class.java)) {
+        if (isRunning) {
             context.stopService(serviceIntent)
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -80,20 +81,12 @@ fun LocationServiceController() {
             }
         }
     }) {
-        val label = if (isServiceRunning(context, LocationService::class.java)) {
+        val label = if (isRunning) {
             "서비스 중지"
         } else {
             "서비스 시작"
         }
         Text(text = label)
-    }
-}
-
-// 서비스가 이미 실행 중인지 여부 확인 함수 (추가로 구현)
-fun isServiceRunning(context: Context, serviceClass: Class<*>): Boolean {
-    val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-    return manager.getRunningServices(Int.MAX_VALUE).any {
-        it.service.className == serviceClass.name
     }
 }
 
