@@ -7,6 +7,7 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.android.gms.oss-licenses-plugin")
     id("com.github.jk1.dependency-license-report") version "2.9"
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -72,6 +73,8 @@ dependencies {
     implementation(libs.play.services.oss.licenses)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation(libs.geofire.android.common)
+    implementation("com.jsoizo:kotlin-csv-jvm:1.10.0")
     implementation(libs.play.services.maps)
     implementation(libs.android.maps.utils)
     implementation(libs.maps.compose)

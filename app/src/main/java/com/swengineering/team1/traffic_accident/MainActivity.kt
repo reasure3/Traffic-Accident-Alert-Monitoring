@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.FirebaseApp
 import com.swengineering.team1.traffic_accident.nav.NavBar
 import com.swengineering.team1.traffic_accident.nav.NavigationGraph
 import com.swengineering.team1.traffic_accident.ui.theme.TrafficAccidentAlertMonitoringTheme
@@ -24,6 +25,7 @@ import com.swengineering.team1.traffic_accident.ui.theme.TrafficAccidentAlertMon
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
