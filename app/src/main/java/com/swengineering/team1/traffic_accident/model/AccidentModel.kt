@@ -18,7 +18,7 @@ object AccidentModel {
         val firestore = FirebaseFirestore.getInstance("traffic-data")
         Log.d("AccidentModel", "Firestore 데이터 로드 시작")
         try {
-            val snapshot = firestore.collection("test").get().await()
+            val snapshot = firestore.collection("accident").get().await()
             Log.d("AccidentModel", "데이터 ${snapshot.size()}건 가져옴")
             Log.d("AccidentModel", "총 문서 수: ${snapshot.documents.size}")
 
