@@ -54,6 +54,9 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
                 Manifest.permission.ACCESS_BACKGROUND_LOCATION
             else null,
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                Manifest.permission.POST_NOTIFICATIONS
+            else null
         ).toTypedArray(),
         msgToSetting = "위치 권한을 항상 허용으로 바꿔주세요."
     )
