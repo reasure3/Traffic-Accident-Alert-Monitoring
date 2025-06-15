@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<defaults>
+  <entry>
+    <key>alert_radius_meters</key>
+    <value>50</value>
+  </entry>
+  <entry>
+    <key>accident_period_days</key>
+    <value>1000</value>
+  </entry>
+  <entry>
+    <key>min_accident_count</key>
+    <value>1</value>
+  </entry>
+  <entry>
+    <key>weather_condition_enabled</key>
+    <value>false</value>
+  </entry>
+  <entry>
+    <key>notification_min_cooldown_mills</key>
+    <value>5000</value>
+  </entry>
+  <entry>
+    <key>notification_max_cooldown_mills</key>
+    <value>10000</value>
+  </entry>
+  <entry>
+    <key>min_severity</key>
+    <value>3</value>
+  </entry>
+</defaults>

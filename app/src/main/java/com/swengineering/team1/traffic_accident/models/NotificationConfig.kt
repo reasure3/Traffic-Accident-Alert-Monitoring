@@ -5,5 +5,7 @@ data class NotificationConfig(
     val accidentPeriodDays: Int,
     val minAccidentCount: Int,
     val weatherConditionEnabled: Boolean,
-    val notificationCooldownMinutes: Int
-) 
+    val notificationMinCooldownMills: Int,
+    val notificationMaxCooldownMills: Int,
+    val minSeverity: Int,
+)

@@ -48,10 +48,34 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Notification Cooldown (minutes)" />
+            android:text="Min Notification Cooldown (mills)" />
 
         <EditText
-            android:id="@+id/cooldownEditText"
+            android:id="@+id/minCooldownEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Max Notification Cooldown (mills)" />
+
+        <EditText
+            android:id="@+id/maxCooldownEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Min Severity" />
+
+        <EditText
+            android:id="@+id/minSeverityEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number" />

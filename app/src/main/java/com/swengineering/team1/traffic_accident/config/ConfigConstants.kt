@@ -5,5 +5,7 @@ object ConfigConstants {
     const val ACCIDENT_PERIOD_DAYS = "accident_period_days"
     const val MIN_ACCIDENT_COUNT = "min_accident_count"
     const val WEATHER_CONDITION_ENABLED = "weather_condition_enabled"
-    const val NOTIFICATION_COOLDOWN_MINUTES = "notification_cooldown_minutes"
-} 
+    const val NOTIFICATION_MIN_COOLDOWN_MILLS = "notification_min_cooldown_mills"
+    const val NOTIFICATION_MAX_COOLDOWN_MILLS = "notification_max_cooldown_mills"
+    const val MIN_SEVERITY = "min_severity"
+}
