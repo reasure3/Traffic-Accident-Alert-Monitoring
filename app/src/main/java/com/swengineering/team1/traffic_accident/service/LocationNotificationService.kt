@@ -221,6 +221,7 @@ class LocationNotificationService : Service() {
                 }
             }
             if (matchingPos.isNotEmpty()) {
+                Log.d("position", "send notification")
                 sendLocationNotification(matchingPos[0])
             }
         }.addOnFailureListener {

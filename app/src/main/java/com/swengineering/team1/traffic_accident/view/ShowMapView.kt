@@ -1,8 +1,7 @@
-package com.swengineering.team1.traffic_accident.screen.view
+package com.swengineering.team1.traffic_accident.view
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.LatLng
@@ -17,10 +16,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.compose.ui.Alignment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import android.graphics.Color as AndroidColor
 import androidx.core.graphics.createBitmap
-import com.swengineering.team1.traffic_accident.view.MyLocationButtonView
 
 @SuppressLint("MissingPermission")
 @Composable
@@ -28,14 +25,16 @@ fun ShowMapView(
     cameraPositionState: CameraPositionState,
     accidents: List<AccidentItem>, // 컨트롤러에서 전달받은 필터된 데이터
     selectedLocation: LatLng?, // 컨트롤러에서 전달받은 현재 위치
-    onMyLocationClick: () -> Unit
+    onMyLocationClick: () -> Unit,
+    onMapLoaded: () -> Unit
 ) {
     Box(Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             uiSettings = MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false),
-            properties = MapProperties(isMyLocationEnabled = true)
+            properties = MapProperties(isMyLocationEnabled = true),
+            onMapLoaded = onMapLoaded
         ) {
             selectedLocation?.let {
                 Marker(

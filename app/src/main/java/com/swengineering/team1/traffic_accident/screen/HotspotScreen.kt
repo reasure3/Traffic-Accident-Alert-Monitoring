@@ -24,12 +24,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.firebase.geofire.GeoLocation
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.rememberCameraPositionState
@@ -37,7 +39,6 @@ import com.swengineering.team1.traffic_accident.model.AccidentModel
 import com.swengineering.team1.traffic_accident.model.MapFilterModel
 import com.swengineering.team1.traffic_accident.model.MapLocationModel
 import com.swengineering.team1.traffic_accident.screen.util.PermissionAwareScreen
-import com.swengineering.team1.traffic_accident.screen.view.ShowMapView
 import com.swengineering.team1.traffic_accident.service.LocationError
 import com.swengineering.team1.traffic_accident.service.LocationService
 import com.swengineering.team1.traffic_accident.service.MapSearchService
@@ -45,6 +46,7 @@ import com.swengineering.team1.traffic_accident.view.AccidentFilterPanel
 import com.swengineering.team1.traffic_accident.view.FilterDialog
 import com.swengineering.team1.traffic_accident.view.SearchBar
 import com.swengineering.team1.traffic_accident.view.ShowGPSDialog
+import com.swengineering.team1.traffic_accident.view.ShowMapView
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -127,10 +129,10 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
         )
     }
 
-    LaunchedEffect(Unit) {
-        Log.d("HotspotScreen", "loadAccidents 호출됨")
-        AccidentModel.loadAccidents()
-    }
+//    LaunchedEffect(Unit) {
+//        Log.d("HotspotScreen", "loadAccidents 호출됨")
+//        AccidentModel.loadAccidents()
+//    }
     /*
         LaunchedEffect(Unit) {
             Log.d("HotspotScreen", "testFirestoreAccess 호출됨")
@@ -168,6 +170,7 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
         weatherList = filter.weatherList
     )
     */
+
     Scaffold(
         topBar = {
             Column(
@@ -187,7 +190,7 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
                 AccidentFilterPanel(onFilterClick = { showFilterDialog.value = true })
             }
         },
-        content = {
+        content = { innerPadding ->
             ShowMapView(
                 cameraPositionState = cameraPositionState,
                 accidents = filteredData,
@@ -214,10 +217,30 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
                                 .show()
                         }
                     }
+                },
+                onMapLoaded = {
+                    val latLng = cameraPositionState.position.target
+                    val loc = GeoLocation(latLng.latitude, latLng.longitude)
+                    AccidentModel.loadAccidents(loc, cameraPositionState.position.zoom)
                 }
             )
         }
     )
+
+    LaunchedEffect(cameraPositionState) {
+        snapshotFlow { cameraPositionState.isMoving }
+            .collect { isMoving ->
+                if (!isMoving) {
+                    val pos = cameraPositionState.position
+                    Log.d("MapCamera", "Move Finished at ${pos.target}")
+                    // 이동이 끝났을 때만 실행
+
+                    val latLng = pos.target
+                    val loc = GeoLocation(latLng.latitude, latLng.longitude)
+                    AccidentModel.loadAccidents(loc, pos.zoom)
+                }
+            }
+    }
 
     if (showFilterDialog.value) {
         FilterDialog(

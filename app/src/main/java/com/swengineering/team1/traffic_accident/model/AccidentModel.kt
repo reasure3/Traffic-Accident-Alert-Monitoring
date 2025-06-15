@@ -1,68 +1,103 @@
 package com.swengineering.team1.traffic_accident.model
 
 import android.util.Log
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.common.primitives.Doubles.min
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.tasks.await
+import kotlin.math.cos
+import kotlin.math.pow
 
 object AccidentModel {
 
     private val _accidentState = MutableStateFlow<List<AccidentItem>>(emptyList())
     val accidentState: StateFlow<List<AccidentItem>> = _accidentState.asStateFlow()
+    private var isQuerying = false
+
+    fun zoomToRadiusMeters(zoom: Float): Double {
+        // 대략적 추정 (화면의 절반 기준): 40075000 / 2^zoom / 2
+        return 156543.03392 * cos(Math.toRadians(0.0)) / 2.0.pow(zoom.toDouble()) * 500.0
+    }
+
 
     // Firestore에서 데이터를 가져와 상태를 갱신
-    suspend fun loadAccidents() {
+    fun loadAccidents(loc: GeoLocation, zoom: Float) {
+        if (isQuerying) return
+
+        isQuerying = true
+
         val firestore = FirebaseFirestore.getInstance("traffic-data")
+        val dbCollection = firestore.collection("accident")
+
         Log.d("AccidentModel", "Firestore 데이터 로드 시작")
-        try {
-            val snapshot = firestore.collection("accident").get().await()
-            Log.d("AccidentModel", "데이터 ${snapshot.size()}건 가져옴")
-            Log.d("AccidentModel", "총 문서 수: ${snapshot.documents.size}")
 
-            val accidentList = snapshot.documents.mapNotNull { doc ->
-                try {
-                    val positionMap = doc.get("position") as? Map<*, *> ?: return@mapNotNull null
-                    val startPos = positionMap["start_pos"] as? GeoPoint ?: return@mapNotNull null
-                    Log.d("AccidentModel", "문서 start_pos: $startPos")
-                    val lat = startPos.latitude
-                    val lng = startPos.longitude
+        val radius = zoomToRadiusMeters(zoom)
+        val bounds = GeoFireUtils.getGeoHashQueryBounds(loc, min(radius, 50.0 * 1000))
+        val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
+        bounds.forEach {
+            val q = dbCollection
+                .orderBy("position.start_hash")
+                .startAt(it.startHash)
+                .endAt(it.endHash)
+            tasks.add(q.get())
+        }
 
-                    val severity = doc.getLong("severity")?.toInt() ?: return@mapNotNull null
-                    Log.d("AccidentModel", "문서 severity: $severity")
-                    val weatherMap = doc.get("weather") as? Map<*, *>
-                    val weatherRaw = weatherMap?.get("weather_condition")?.toString()?.lowercase()
+        Tasks.whenAllComplete(tasks).addOnCompleteListener {
+            try {
+                val loadedItem: MutableList<AccidentItem> = arrayListOf()
+                for (task in tasks) {
+                    val snap = task.result
+                    val docs = snap.documents
+                    Log.d("AccidentModel", "${docs.size}건의 문서 분석 중")
+                    for (doc in docs) {
+                        val positionMap = doc.get("position") as? Map<*, *> ?: continue
+                        val startPos = positionMap["start_pos"] as? GeoPoint ?: continue
+                        Log.d("AccidentModel", "문서 start_pos: $startPos")
+                        val lat = startPos.latitude
+                        val lng = startPos.longitude
 
-                    Log.d("AccidentModel", "문서 weather: $weatherRaw")
-                    val weather = when {
-                        weatherRaw == null -> ""
-                        "rain" in weatherRaw -> "비"
-                        "snow" in weatherRaw -> "눈"
-                        "cloudy" in weatherRaw -> "흐림"
-                        "fair" in weatherRaw -> "맑음"
-                        else -> ""
+                        val severity = doc.getLong("severity")?.toInt() ?: continue
+                        Log.d("AccidentModel", "문서 severity: $severity")
+                        val weatherMap = doc.get("weather") as? Map<*, *>
+                        val weatherRaw =
+                            weatherMap?.get("weather_condition")?.toString()?.lowercase()
+
+                        Log.d("AccidentModel", "문서 weather: $weatherRaw")
+                        val weather = when {
+                            weatherRaw == null -> ""
+                            "rain" in weatherRaw -> "비"
+                            "snow" in weatherRaw -> "눈"
+                            "cloudy" in weatherRaw -> "흐림"
+                            "fair" in weatherRaw -> "맑음"
+                            else -> ""
+                        }
+
+                        loadedItem.add(
+                            AccidentItem(
+                                id = doc.id,
+                                severity = severity,
+                                weather = weather,
+                                latitude = lat.toString(),
+                                longitude = lng.toString()
+                            )
+                        )
                     }
-
-                    AccidentItem(
-                        id = doc.id,
-                        severity = severity,
-                        weather = weather,
-                        latitude = lat.toString(),
-                        longitude = lng.toString()
-                    )
-                } catch (e: Exception) {
-                    Log.e("AccidentModel", "문서 처리 중 오류: ${e.message}")
-                    null
                 }
+                isQuerying = false
+
+                _accidentState.value = loadedItem
+                Log.d("AccidentModel", "데이터 ${loadedItem.size}건 가져옴")
+            } catch (e: Exception) {
+                Log.e("AccidentModel", "Firestore 로드 실패: ${e.message}")
+                _accidentState.value = emptyList()
             }
-
-            _accidentState.value = accidentList
-
-        } catch (e: Exception) {
-            Log.e("AccidentModel", "Firestore 로드 실패: ${e.message}")
-            _accidentState.value = emptyList()
         }
     }
 

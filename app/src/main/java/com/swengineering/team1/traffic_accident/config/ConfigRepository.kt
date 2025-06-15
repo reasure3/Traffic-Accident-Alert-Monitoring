@@ -50,7 +50,7 @@ class ConfigRepository private constructor() {
             notificationMaxCooldownMills =
                 remoteConfig.getLong(ConfigConstants.NOTIFICATION_MAX_COOLDOWN_MILLS).toInt(),
             minSeverity =
-                remoteConfig.getLong(ConfigConstants.NOTIFICATION_MAX_COOLDOWN_MILLS).toInt(),
+                remoteConfig.getLong(ConfigConstants.MIN_SEVERITY).toInt(),
         )
     }
 
