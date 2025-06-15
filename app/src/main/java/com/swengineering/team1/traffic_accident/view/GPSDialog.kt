@@ -29,8 +29,3 @@ fun ShowGPSDialog(
         }
     )
 }
-
-fun openGpsSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-    context.startActivity(intent)
-}
