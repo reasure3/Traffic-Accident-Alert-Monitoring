@@ -29,12 +29,16 @@ import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
 import com.swengineering.team1.traffic_accident.MainActivity
 import com.swengineering.team1.traffic_accident.R
+import com.swengineering.team1.traffic_accident.config.ConfigRepository
+import com.swengineering.team1.traffic_accident.models.NotificationConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class LocationService : Service() {
 
+    private lateinit var configRepository: ConfigRepository
+    private lateinit var configs: NotificationConfig
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private var dbCollection: CollectionReference? = null
@@ -81,8 +85,13 @@ class LocationService : Service() {
         val notification = BackgroundLocationNotification.buildForegroundNotification(this)
         startForeground(NOTIF_ID, notification)
 
-        // 5) 위치 업데이트 요청 시작
-        startLocationUpdates()
+
+        configRepository = ConfigRepository.INSTANCE
+        configRepository.fetchRemoteConfig {
+            configs = configRepository.getNotificationConfig()
+            // 5) 위치 업데이트 요청 시작
+            startLocationUpdates()
+        }
 
         // 서비스가 강제 종료되어도 다시 재시작을 원하면 START_STICKY
         return START_STICKY
@@ -102,8 +111,8 @@ class LocationService : Service() {
 
     // 위치 업데이트 요청
     private fun startLocationUpdates() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10_000L)
-            .setMinUpdateIntervalMillis(5_000L)
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, configs.notificationMaxCooldownMills.toLong())
+            .setMinUpdateIntervalMillis(configs.notificationMinCooldownMills.toLong())
             .build()
 
         if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -130,7 +139,7 @@ class LocationService : Service() {
             val channel = NotificationChannel(
                 channelId,
                 "위치 기반 알림",
-                NotificationManager.IMPORTANCE_MAX
+                NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 description = "특정 위치 도달 시 사용자에게 알림을 보냅니다."
             }
@@ -166,7 +175,7 @@ class LocationService : Service() {
             return
         }
 
-        val minDistForQuery = 20.0 // TODO: config에서 값 얻기
+        val minDistForQuery = configs.queryDistanceIntervalMeters
         val currentLoc = GeoLocation(location.latitude, location.longitude)
         lastQueryLoc?.let {
             val dist = GeoFireUtils.getDistanceBetween(it, currentLoc)
@@ -179,7 +188,7 @@ class LocationService : Service() {
         isQuerying = true
         lastQueryLoc = currentLoc
 
-        val radiusInM = 50.0 // TODO: Config에서 radius 얻기
+        val radiusInM = configs.alertRadiusMeters.toDouble()
         val bounds = GeoFireUtils.getGeoHashQueryBounds(currentLoc, radiusInM)
         Log.d("position", "bounds size: ${bounds.size}")
         val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
@@ -200,7 +209,7 @@ class LocationService : Service() {
                 val snap = task.result
                 for (doc in snap.documents) {
                     Log.d("position", "document: ${doc.id} => ${doc.data}")
-                    val minSeverity = 3 // TODO: Config로 값 얻기
+                    val minSeverity = configs.minSeverity
                     val severity = doc.getDouble("severity")?.toInt() ?: 4
                     val pos = doc.getGeoPoint("position.start_pos") ?: continue
                     val docLocation = GeoLocation(pos.latitude, pos.longitude)
