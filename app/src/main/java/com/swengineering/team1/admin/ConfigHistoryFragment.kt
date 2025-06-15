@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
-import com.swengineering.team1.R
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.models.ConfigChangeHistory
 import com.swengineering.team1.models.NotificationConfig
 import java.text.SimpleDateFormat
@@ -67,13 +67,12 @@ class ConfigHistoryFragment : Fragment() {
             try {
                 val timestamp = sdf.parse(item["timestamp"] as String) ?: Date()
                 val adminUser = item["adminUser"] as String
-                // 'changes' es un mapa de los valores que cambiaron.
-                // Para el historial, no tenemos el 'antes' y 'después' completos,
-                // así que creamos objetos NotificationConfig vacíos como marcadores de posición.
-                val dummyConfig = NotificationConfig(0,0,0,false,0)
                 
-                // Aquí podrías mejorar la lógica para mostrar los cambios exactos
-                val historyItem = ConfigChangeHistory(timestamp, adminUser, dummyConfig, dummyConfig, item["changes"] as? Map<String, Any>)
+                val historyItem = ConfigChangeHistory(
+                    timestamp,
+                    adminUser,
+                    item["changes"] as? Map<String, Any>
+                )
                 historyList.add(historyItem)
             } catch (e: Exception) {
                 Log.e("ConfigHistory", "Error parsing history item", e)

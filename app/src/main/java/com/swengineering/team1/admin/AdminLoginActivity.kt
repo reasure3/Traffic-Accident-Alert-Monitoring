@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
-import com.swengineering.team1.R
+import com.swengineering.team1.traffic_accident.R
 
 class AdminLoginActivity : AppCompatActivity() {
 

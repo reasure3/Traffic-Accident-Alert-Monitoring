@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.swengineering.team1.R
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.models.ConfigChangeHistory
 import java.text.SimpleDateFormat
 import java.util.Locale

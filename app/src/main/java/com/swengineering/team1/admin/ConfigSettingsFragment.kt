@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
-import com.swengineering.team1.R
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.config.ConfigRepository
 import com.swengineering.team1.models.NotificationConfig
 
@@ -61,16 +61,25 @@ class ConfigSettingsFragment : Fragment() {
     }
 
     private fun saveNewConfig() {
-        // Construye un mapa con los nuevos valores desde los EditTexts
-        val newValues = mapOf(
-            "alert_radius_meters" to radiusEditText.text.toString().toIntOrNull(),
-            "accident_period_days" to periodEditText.text.toString().toIntOrNull(),
-            "min_accident_count" to countEditText.text.toString().toIntOrNull(),
-            "notification_cooldown_minutes" to cooldownEditText.text.toString().toIntOrNull(),
-            "weather_condition_enabled" to weatherSwitch.isChecked
-        ).filterValues { it != null } // Filtra valores nulos si un campo está vacío
+        // Construye un objeto NotificationConfig con los nuevos valores
+        val newConfig = NotificationConfig(
+            alertRadiusMeters = radiusEditText.text.toString().toIntOrNull() ?: 0,
+            accidentPeriodDays = periodEditText.text.toString().toIntOrNull() ?: 0,
+            minAccidentCount = countEditText.text.toString().toIntOrNull() ?: 0,
+            weatherConditionEnabled = weatherSwitch.isChecked,
+            notificationCooldownMinutes = cooldownEditText.text.toString().toIntOrNull() ?: 0
+        )
 
-        if (newValues.size < 5) {
+        // Convierte el objeto a un mapa para enviarlo a la función de Firebase
+        val newValues = mapOf(
+            "alert_radius_meters" to newConfig.alertRadiusMeters,
+            "accident_period_days" to newConfig.accidentPeriodDays,
+            "min_accident_count" to newConfig.minAccidentCount,
+            "notification_cooldown_minutes" to newConfig.notificationCooldownMinutes,
+            "weather_condition_enabled" to newConfig.weatherConditionEnabled
+        )
+
+        if (newValues.values.any { (it as? Int ?: 1) <= 0 } && newValues.size < 5) {
             Toast.makeText(requireContext(), "Please fill all fields correctly.", Toast.LENGTH_SHORT).show()
             return
         }
