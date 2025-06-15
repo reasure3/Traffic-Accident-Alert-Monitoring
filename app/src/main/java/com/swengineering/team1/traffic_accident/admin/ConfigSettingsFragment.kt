@@ -1,4 +1,4 @@
-package com.swengineering.team1.admin
+package com.swengineering.team1.traffic_accident.admin
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,8 +12,8 @@ import com.google.android.material.switchmaterial.SwitchMaterial
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.swengineering.team1.traffic_accident.R
-import com.swengineering.team1.config.ConfigRepository
-import com.swengineering.team1.models.NotificationConfig
+import com.swengineering.team1.traffic_accident.config.ConfigRepository
+import com.swengineering.team1.traffic_accident.models.NotificationConfig
 
 class ConfigSettingsFragment : Fragment() {
 

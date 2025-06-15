@@ -1,4 +1,4 @@
-package com.swengineering.team1.config
+package com.swengineering.team1.traffic_accident.config
 
 object ConfigConstants {
     const val ALERT_RADIUS_METERS = "alert_radius_meters"

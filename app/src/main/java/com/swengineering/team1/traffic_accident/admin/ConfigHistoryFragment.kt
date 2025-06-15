@@ -1,4 +1,4 @@
-package com.swengineering.team1.admin
+package com.swengineering.team1.traffic_accident.admin
 
 import android.os.Bundle
 import android.util.Log
@@ -12,8 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.swengineering.team1.traffic_accident.R
-import com.swengineering.team1.models.ConfigChangeHistory
-import com.swengineering.team1.models.NotificationConfig
+import com.swengineering.team1.traffic_accident.models.ConfigChangeHistory
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone

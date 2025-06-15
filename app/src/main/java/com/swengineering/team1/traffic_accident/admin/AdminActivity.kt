@@ -1,4 +1,4 @@
-package com.swengineering.team1.admin
+package com.swengineering.team1.traffic_accident.admin
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

@@ -1,4 +1,4 @@
-package com.swengineering.team1.models
+package com.swengineering.team1.traffic_accident.models
 
 import java.util.Date
 

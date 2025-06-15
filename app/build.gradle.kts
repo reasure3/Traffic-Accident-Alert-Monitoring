@@ -59,15 +59,13 @@ secrets {
 }
 
 dependencies {
-    // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:33.15.0"))
-
     // Add the dependency for the Firebase Remote Config library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-config-ktx")
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-functions-ktx")
+    implementation("androidx.compose.material:material-icons-extended")
 
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.coroutines.android)

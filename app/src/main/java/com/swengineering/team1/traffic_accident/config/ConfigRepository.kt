@@ -1,8 +1,8 @@
-package com.swengineering.team1.config
+package com.swengineering.team1.traffic_accident.config
 
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
-import com.swengineering.team1.models.NotificationConfig
+import com.swengineering.team1.traffic_accident.models.NotificationConfig
 
 class ConfigRepository {
 

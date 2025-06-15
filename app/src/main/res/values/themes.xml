@@ -3,5 +3,5 @@
 
     <style name="Theme.TrafficAccidentAlertMonitoring" parent="android:Theme.Material.Light.NoActionBar" />
 
-    <style name="Theme.App.License" parent="Theme.AppCompat.DayNight" />
+    <style name="Theme.App.TrafficAccidentAlertMonitoring" parent="Theme.AppCompat.DayNight" />
 </resources>
