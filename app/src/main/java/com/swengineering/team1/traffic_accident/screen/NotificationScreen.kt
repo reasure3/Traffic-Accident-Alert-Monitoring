@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.swengineering.team1.traffic_accident.screen.util.PermissionAwareScreen
-import com.swengineering.team1.traffic_accident.service.LocationService
+import com.swengineering.team1.traffic_accident.service.LocationNotificationService
 
 @Preview
 @Composable
@@ -65,11 +65,11 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
 @Composable
 fun LocationServiceController() {
     val context = LocalContext.current
-    val isRunning by LocationService.isRunning.collectAsState()
+    val isRunning by LocationNotificationService.isRunning.collectAsState()
 
     // 서비스 인텐트
     val serviceIntent = remember {
-        Intent(context, LocationService::class.java)
+        Intent(context, LocationNotificationService::class.java)
     }
 
     // 버튼을 눌러 서비스 토글

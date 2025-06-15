@@ -8,7 +8,6 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.android.gms.oss-licenses-plugin")
     id("com.github.jk1.dependency-license-report") version "2.9"
-    id("com.google.gms.google-services")
 }
 
 android {
