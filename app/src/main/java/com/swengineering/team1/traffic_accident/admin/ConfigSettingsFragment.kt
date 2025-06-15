@@ -1,6 +1,7 @@
 package com.swengineering.team1.traffic_accident.admin
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -109,7 +110,7 @@ class ConfigSettingsFragment : Fragment() {
         val data = hashMapOf("newConfig" to newValues)
 
         Firebase.functions
-            .getHttpsCallable("updateconfigandlog") // El nombre de la función debe ser en minúsculas
+            .getHttpsCallable("updateConfigAndLog") // El nombre de la función debe ser en minúsculas
             .call(data)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
@@ -124,6 +125,7 @@ class ConfigSettingsFragment : Fragment() {
                         "Error: ${task.exception?.message}",
                         Toast.LENGTH_LONG
                     ).show()
+                    Log.w("updateConfigAndLog", "Error UpdateConfigAndLog", task.exception)
                 }
             }
     }

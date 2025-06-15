@@ -9,6 +9,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.swengineering.team1.traffic_accident.R
@@ -39,8 +40,9 @@ class ConfigHistoryFragment : Fragment() {
     }
 
     private fun fetchHistory() {
+        Log.d("Firebase Auth", FirebaseAuth.getInstance().currentUser?.email ?: "none")
         Firebase.functions
-            .getHttpsCallable("gethistory") // El nombre de la función debe ser en minúsculas
+            .getHttpsCallable("getHistory") // El nombre de la función debe ser en minúsculas
             .call()
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
