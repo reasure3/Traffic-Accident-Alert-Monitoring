@@ -8,7 +8,6 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.android.gms.oss-licenses-plugin")
     id("com.github.jk1.dependency-license-report") version "2.9"
-    id("com.google.gms.google-services")
 }
 
 android {
@@ -60,14 +59,6 @@ secrets {
 }
 
 dependencies {
-    // Add the dependency for the Firebase Remote Config library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-config-ktx")
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.firebase:firebase-functions-ktx")
-    implementation("androidx.compose.material:material-icons-extended")
-
     implementation(libs.accompanist.permissions)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
@@ -79,8 +70,13 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.play.services.oss.licenses)
     implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.config.ktx)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.functions.ktx)
     implementation(libs.firebase.firestore)
     implementation(libs.geofire.android.common)
     implementation(libs.play.services.maps)
