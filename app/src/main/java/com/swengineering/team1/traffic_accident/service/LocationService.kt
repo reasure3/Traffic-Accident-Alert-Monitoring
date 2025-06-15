@@ -3,6 +3,7 @@ package com.swengineering.team1.traffic_accident.service
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -10,13 +11,23 @@ import android.location.Location
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.firebase.geofire.GeoFireUtils
+import com.firebase.geofire.GeoLocation
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.QuerySnapshot
+import com.swengineering.team1.traffic_accident.MainActivity
 import com.swengineering.team1.traffic_accident.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +37,10 @@ class LocationService : Service() {
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private var dbCollection: CollectionReference? = null
+    private var isQuerying = false
+
+    private var lastQueryLoc: GeoLocation? = null
 
     // 알림 ID, 채널 ID
     companion object {
@@ -50,14 +65,14 @@ class LocationService : Service() {
                 super.onLocationResult(locationResult)
                 val location = locationResult.lastLocation ?: return
 
-                // TODO: 위치를 받아 조건 검사 (예: 특정 영역 진입, 이동 거리 등)
                 // 예시: 위도/경도가 특정 범위 내로 들어오면 알림 전송
-                if (shouldSendNotification(location)) {
-                    sendLocationNotification(location)
-                }
+                checkLocationNotification(location)
+//                sendLocationNotification(GeoPoint(location.latitude, location.longitude))
             }
         }
 
+        val db = FirebaseFirestore.getInstance("traffic-data")
+        dbCollection = db.collection("accident")
         _isRunning.value = true
     }
 
@@ -76,6 +91,7 @@ class LocationService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopLocationUpdates()
+        dbCollection = null
         _isRunning.value = false
     }
 
@@ -104,10 +120,9 @@ class LocationService : Service() {
     }
 
     // 알림 전송 로직
-    private fun sendLocationNotification(location: Location) {
+    private fun sendLocationNotification(location: GeoPoint) {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        // 고유 알림 ID (아래는 예시로 현재 시간 밀리초 사용)
         val notifyId = System.currentTimeMillis().toInt()
 
         val channelId = "location_alerts" // 알림 채널(ID) 별도 생성 가능
@@ -115,26 +130,95 @@ class LocationService : Service() {
             val channel = NotificationChannel(
                 channelId,
                 "위치 기반 알림",
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_MAX
             ).apply {
                 description = "특정 위치 도달 시 사용자에게 알림을 보냅니다."
             }
             nm.createNotificationChannel(channel)
         }
 
+        val activityIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(
+            this,
+            0,
+            activityIntent,
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_hotspot_filled) // 적절한 아이콘 지정
+            .setSmallIcon(R.drawable.ic_hotspot_filled)
             .setContentTitle("위치 알림")
-            .setContentText("현재 위치: (${location.latitude}, ${location.longitude})")
-            .setAutoCancel(true)
+            .setContentText("위험한 위치: (${location.latitude}, ${location.longitude})")
+            .setAutoCancel(false)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setContentIntent(pendingIntent)
+            .setOngoing(true)
             .build()
 
         nm.notify(notifyId, notification)
     }
 
-    // TODO: 위치 기반 알림을 보낼지 결정하는 함수
-    private fun shouldSendNotification(location: Location): Boolean {
-        // 예시: 위도가 37.0~37.1 사이, 경도가 127.0~127.1 사이에 들어오면 true
-        return (location.latitude in 37.0..37.1 && location.longitude in 127.0..127.1)
+    private fun checkLocationNotification(location: Location) {
+        if (isQuerying) return
+
+        if (dbCollection == null) {
+            isQuerying = false
+            return
+        }
+
+        val minDistForQuery = 20.0 // TODO: config에서 값 얻기
+        val currentLoc = GeoLocation(location.latitude, location.longitude)
+        lastQueryLoc?.let {
+            val dist = GeoFireUtils.getDistanceBetween(it, currentLoc)
+            if (dist < minDistForQuery) {
+                isQuerying = false
+                return
+            }
+        }
+
+        isQuerying = true
+        lastQueryLoc = currentLoc
+
+        val radiusInM = 50.0 // TODO: Config에서 radius 얻기
+        val bounds = GeoFireUtils.getGeoHashQueryBounds(currentLoc, radiusInM)
+        Log.d("position", "bounds size: ${bounds.size}")
+        val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
+        bounds.forEach {
+            val q = dbCollection!!
+                .orderBy("position.start_hash")
+                .startAt(it.startHash)
+                .endAt(it.endHash)
+            tasks.add(q.get())
+        }
+        Log.d("position", "tasks size: ${tasks.size}")
+
+        Tasks.whenAllComplete(tasks).addOnCompleteListener {
+            Log.d("position", "complete to get pos")
+            isQuerying = false
+            val matchingPos: MutableList<GeoPoint> = ArrayList()
+            for (task in tasks) {
+                val snap = task.result
+                for (doc in snap.documents) {
+                    Log.d("position", "document: ${doc.id} => ${doc.data}")
+                    val minSeverity = 3 // TODO: Config로 값 얻기
+                    val severity = doc.getDouble("severity")?.toInt() ?: 4
+                    val pos = doc.getGeoPoint("position.start_pos") ?: continue
+                    val docLocation = GeoLocation(pos.latitude, pos.longitude)
+                    val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, currentLoc)
+                    Log.d("position", "distance: ${distanceInM}m, position: $pos")
+                    if (severity >= minSeverity && distanceInM <= radiusInM) {
+                        matchingPos.add(pos)
+                    }
+                }
+            }
+            if (matchingPos.isNotEmpty()) {
+                sendLocationNotification(matchingPos[0])
+            }
+        }.addOnFailureListener {
+            Log.w("position", "fail to get pos")
+        }.addOnSuccessListener {
+            Log.d("position", "success to get pos")
+        }
+        Log.d("position", "end function")
     }
 }
