@@ -5,6 +5,10 @@
     <value>50</value>
   </entry>
   <entry>
+    <key>query_distance_interval_meters</key>
+    <value>20</value>
+  </entry>
+  <entry>
     <key>accident_period_days</key>
     <value>1000</value>
   </entry>

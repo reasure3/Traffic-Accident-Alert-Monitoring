@@ -37,6 +37,8 @@ class ConfigRepository private constructor() {
         return NotificationConfig(
             alertRadiusMeters =
                 remoteConfig.getLong(ConfigConstants.ALERT_RADIUS_METERS).toInt(),
+            queryDistanceIntervalMeters =
+                remoteConfig.getLong(ConfigConstants.QUERY_DISTANCE_INTERVAL_METERS).toInt(),
             accidentPeriodDays =
                 remoteConfig.getLong(ConfigConstants.ACCIDENT_PERIOD_DAYS).toInt(),
             minAccidentCount =

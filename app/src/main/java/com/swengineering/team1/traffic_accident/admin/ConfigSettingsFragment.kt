@@ -21,6 +21,7 @@ class ConfigSettingsFragment : Fragment() {
 
     private lateinit var configRepository: ConfigRepository
     private lateinit var radiusEditText: EditText
+    private lateinit var queryIntervalEditText: EditText
     private lateinit var periodEditText: EditText
     private lateinit var countEditText: EditText
     private lateinit var minCooldownEditText: EditText
@@ -42,6 +43,7 @@ class ConfigSettingsFragment : Fragment() {
         configRepository = ConfigRepository.INSTANCE
 
         radiusEditText = view.findViewById(R.id.radiusEditText)
+        queryIntervalEditText = view.findViewById(R.id.queryIntervalEditText)
         periodEditText = view.findViewById(R.id.periodEditText)
         countEditText = view.findViewById(R.id.countEditText)
         minCooldownEditText = view.findViewById(R.id.minCooldownEditText)
@@ -65,6 +67,7 @@ class ConfigSettingsFragment : Fragment() {
         ) {
             val config = configRepository.getNotificationConfig()
             radiusEditText.setText(config.alertRadiusMeters.toString())
+            queryIntervalEditText.setText(config.queryDistanceIntervalMeters.toString())
             periodEditText.setText(config.accidentPeriodDays.toString())
             countEditText.setText(config.minAccidentCount.toString())
             minCooldownEditText.setText(config.notificationMinCooldownMills.toString())
@@ -79,6 +82,7 @@ class ConfigSettingsFragment : Fragment() {
         // Construye un objeto NotificationConfig con los nuevos valores
         val newConfig = NotificationConfig(
             alertRadiusMeters = radiusEditText.text.toString().toIntOrNull() ?: 0,
+            queryDistanceIntervalMeters = queryIntervalEditText.text.toString().toIntOrNull() ?: 0,
             accidentPeriodDays = periodEditText.text.toString().toIntOrNull() ?: 0,
             minAccidentCount = countEditText.text.toString().toIntOrNull() ?: 0,
             weatherConditionEnabled = weatherSwitch.isChecked,
@@ -90,6 +94,7 @@ class ConfigSettingsFragment : Fragment() {
         // Convierte el objeto a un mapa para enviarlo a la función de Firebase
         val newValues = mapOf(
             ConfigConstants.ALERT_RADIUS_METERS to newConfig.alertRadiusMeters,
+            ConfigConstants.QUERY_DISTANCE_INTERVAL_METERS to newConfig.queryDistanceIntervalMeters,
             ConfigConstants.ACCIDENT_PERIOD_DAYS to newConfig.accidentPeriodDays,
             ConfigConstants.MIN_ACCIDENT_COUNT to newConfig.minAccidentCount,
             ConfigConstants.NOTIFICATION_MIN_COOLDOWN_MILLS to newConfig.notificationMinCooldownMills,
