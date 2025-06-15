@@ -1,6 +1,10 @@
 package com.swengineering.team1.traffic_accident.screen
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.provider.Settings
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresPermission
 import androidx.compose.foundation.layout.Column
@@ -27,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.firebase.FirebaseApp
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.swengineering.team1.traffic_accident.model.AccidentModel
 import com.swengineering.team1.traffic_accident.model.MapFilterModel
@@ -40,7 +45,6 @@ import com.swengineering.team1.traffic_accident.service.LocationService
 import com.swengineering.team1.traffic_accident.service.MapSearchService
 import com.swengineering.team1.traffic_accident.view.PermissionDeniedView
 import com.swengineering.team1.traffic_accident.view.ShowGPSDialog
-import com.swengineering.team1.traffic_accident.view.openGpsSettings
 
 
 @OptIn(ExperimentalPermissionsApi::class)
@@ -67,7 +71,6 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
     val cameraPositionState = rememberCameraPositionState()
     val showGpsDialog = remember { mutableStateOf(false) }
 
-    // 최초 실행 시 현재 위치로 초기화
     LaunchedEffect(Unit) {
         if (!LocationService.isGpsEnabled(context)) {
             val defaultLocation = LocationService.getDefaultLocation()
@@ -88,7 +91,7 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
         } catch (e: LocationError.PermissionDenied) {
             Toast.makeText(context, "GPS 권한이 없습니다", Toast.LENGTH_SHORT).show()
         } catch (e: LocationError.GpsSignalWeak) {
-            Toast.makeText(context, "GPS 신호가 약합니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "GPS 신호가 약해서 현재 위치를 불러올 수 없습니다", Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Toast.makeText(context, "위치 정보를 불러오지 못했습니다", Toast.LENGTH_SHORT).show()
         }
@@ -105,6 +108,17 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
         )
     }
 
+    LaunchedEffect(Unit) {
+        Log.d("HotspotScreen", "loadAccidents 호출됨")
+        AccidentModel.loadAccidents()
+    }
+    /*
+        LaunchedEffect(Unit) {
+            Log.d("HotspotScreen", "testFirestoreAccess 호출됨")
+            AccidentModel.testFirestoreAccess()
+        }
+
+     */
     // 선택된 위치가 있을 경우 카메라 이동
     LaunchedEffect(selectedLatLng) {
         selectedLatLng?.let {
@@ -115,12 +129,26 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
         }
     }
 
+    val accidents by AccidentModel.accidentState.collectAsState()
+    LaunchedEffect(accidents) {
+        if (accidents.isNotEmpty()) {
+            Log.d("HotspotScreen", "현재 사고 데이터 수: ${accidents.size}")
+        }
+    }
+
     val filterState by MapFilterModel.filterState.collectAsState()
     val filteredData = AccidentModel.getFilteredAccidents(
+        allAccidents = accidents,
         severityList = filterState.severityList,
         weatherList = filterState.weatherList
     )
-
+    /*
+    val filtered = AccidentModel.getFilteredAccidents(
+        allAccidents = allAccidents,
+        severityList = filter.severityList,
+        weatherList = filter.weatherList
+    )
+    */
     // 모든 권한이 승인되었는지 판단
     val allRequiredPermission =
         permissionState.revokedPermissions.none { it.permission in permissions }
@@ -150,13 +178,11 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
                         coroutineScope.launch {
                             if (!LocationService.isGpsEnabled(context)) {
                                 showGpsDialog.value = true
-
                                 return@launch
                             }
 
                             try {
                                 val location = LocationService.getCurrentLocation(context)
-
                                 cameraPositionState.animate(
                                     update = CameraUpdateFactory.newLatLngZoom(location, 17f),
                                     durationMs = 1000
@@ -165,7 +191,6 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
                                 Toast.makeText(context, "GPS 신호가 약합니다", Toast.LENGTH_SHORT).show()
                             } catch (e: LocationError.PermissionDenied) {
                                 Toast.makeText(context, "GPS 권한이 없습니다", Toast.LENGTH_SHORT).show()
-                                // 👉 필요시 권한 요청 로직 추가 가능
                             } catch (e: Exception) {
                                 Toast.makeText(context, "위치 정보를 불러오는 데 실패했습니다", Toast.LENGTH_SHORT)
                                     .show()
@@ -215,4 +240,9 @@ fun SearchBarController(
             MapLocationModel.clearSelectedLocation()
         }
     )
+}
+
+fun openGpsSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+    context.startActivity(intent)
 }

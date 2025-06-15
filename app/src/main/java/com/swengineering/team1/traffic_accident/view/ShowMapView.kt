@@ -49,8 +49,8 @@ fun ShowMapView(
                 if (lat != null && lng != null) {
                     Marker(
                         state = MarkerState(position = LatLng(lat, lng)),
-                        icon = BitmapDescriptorFactory.fromBitmap(createRedDotBitmap(16)),
-                        title = accident.locationName
+                        // icon = BitmapDescriptorFactory.fromBitmap(createRedDotBitmap(16)),
+                        title = "${lat}, ${lng}"
                     )
                 }
             }
