@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.firebase.geofire.GeoFireUtils
 import com.firebase.geofire.GeoLocation
@@ -45,6 +46,7 @@ class LocationNotificationService : Service() {
     private var isQuerying = false
 
     private var lastQueryLoc: GeoLocation? = null
+    private var shouldReQuery: Boolean = false
 
     // 알림 ID, 채널 ID
     companion object {
@@ -111,7 +113,10 @@ class LocationNotificationService : Service() {
 
     // 위치 업데이트 요청
     private fun startLocationUpdates() {
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, configs.notificationMaxCooldownMills.toLong())
+        val locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY,
+            configs.notificationMaxCooldownMills.toLong()
+        )
             .setMinUpdateIntervalMillis(configs.notificationMinCooldownMills.toLong())
             .build()
 
@@ -177,14 +182,18 @@ class LocationNotificationService : Service() {
 
         val minDistForQuery = configs.queryDistanceIntervalMeters
         val currentLoc = GeoLocation(location.latitude, location.longitude)
-        lastQueryLoc?.let {
-            val dist = GeoFireUtils.getDistanceBetween(it, currentLoc)
-            if (dist < minDistForQuery) {
-                isQuerying = false
-                return
+
+        if (!shouldReQuery) { // 데이터 얻는데 실패할 경우 거리 상관 없이 다시 쿼리해야 함
+            lastQueryLoc?.let {
+                val dist = GeoFireUtils.getDistanceBetween(it, currentLoc)
+                if (dist < minDistForQuery) {
+                    isQuerying = false
+                    return
+                }
             }
         }
 
+        shouldReQuery = false
         isQuerying = true
         lastQueryLoc = currentLoc
 
@@ -226,8 +235,11 @@ class LocationNotificationService : Service() {
             }
         }.addOnFailureListener {
             Log.w("position", "fail to get pos")
+            Toast.makeText(baseContext, "fail to get data", Toast.LENGTH_SHORT).show()
+            shouldReQuery = true
         }.addOnSuccessListener {
             Log.d("position", "success to get pos")
+            shouldReQuery = false
         }
         Log.d("position", "end function")
     }
