@@ -8,6 +8,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
+import android.location.LocationManager
 import android.os.Build
 import android.os.IBinder
 import android.os.Looper
@@ -43,6 +44,7 @@ class LocationNotificationService : Service() {
     private lateinit var configs: NotificationConfig
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
+    private lateinit var locationManager: LocationManager
     private var dbCollection: CollectionReference? = null
     private var isQuerying = false
 
@@ -95,6 +97,8 @@ class LocationNotificationService : Service() {
             // 5) 위치 업데이트 요청 시작
             startLocationUpdates()
         }
+
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
         // 서비스가 강제 종료되어도 다시 재시작을 원하면 START_STICKY
         return START_STICKY
@@ -194,6 +198,12 @@ class LocationNotificationService : Service() {
             }
         }
 
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            Log.w("position", "gps is disabled")
+            Toast.makeText(this, "Pleas turn on gps", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         shouldReQuery = false
         isQuerying = true
         lastQueryLoc = currentLoc
@@ -243,7 +253,7 @@ class LocationNotificationService : Service() {
             }
         }.addOnFailureListener {
             Log.w("position", "fail to get pos")
-            Toast.makeText(baseContext, "fail to get data", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "fail to get data", Toast.LENGTH_SHORT).show()
             shouldReQuery = true
         }.addOnSuccessListener {
             Log.d("position", "success to get pos")
