@@ -25,6 +25,7 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
@@ -213,7 +214,9 @@ class LocationNotificationService : Service() {
         Tasks.whenAllComplete(tasks).addOnCompleteListener {
             Log.d("position", "complete to get pos")
             isQuerying = false
-            val matchingPos: MutableList<GeoPoint> = ArrayList()
+            val matchingDoc: MutableList<DocumentSnapshot> = ArrayList()
+            var minDistDoc: DocumentSnapshot? = null
+            var minDist: Double = radiusInM + 10
             for (task in tasks) {
                 val snap = task.result
                 for (doc in snap.documents) {
@@ -225,13 +228,18 @@ class LocationNotificationService : Service() {
                     val distanceInM = GeoFireUtils.getDistanceBetween(docLocation, currentLoc)
                     Log.d("position", "distance: ${distanceInM}m, position: $pos")
                     if (severity >= minSeverity && distanceInM <= radiusInM) {
-                        matchingPos.add(pos)
+                        matchingDoc.add(doc)
+                        if (distanceInM < minDist) {
+                            minDistDoc = doc
+                            minDist = distanceInM
+                        }
                     }
                 }
             }
-            if (matchingPos.isNotEmpty()) {
+
+            minDistDoc?.getGeoPoint("position.start_pos")?.let { pos ->
                 Log.d("position", "send notification")
-                sendLocationNotification(matchingPos[0])
+                sendLocationNotification(pos)
             }
         }.addOnFailureListener {
             Log.w("position", "fail to get pos")
