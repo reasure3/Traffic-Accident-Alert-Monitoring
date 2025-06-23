@@ -13,6 +13,7 @@ The main features of this project are:
 
 ### Prerequisites
 
+- Android Studio
 - Node.js
 - npm or yarn
 - Git
@@ -25,27 +26,33 @@ The main features of this project are:
     cd Traffic-Accident-Alert-Monitoring
     ```
 
-2.  **Install backend dependencies:**
+2. **Setting firebase API key**
+    Create 'secrets.properties' file in the root directory and add the following lines
+    ```properties
+    MAPS_API_KEY=<your-api-key>
+    ```
+
+    If you only want to modify the app code, that's enough.
+    To modify the Firebase Functions code, follow these steps
+
+3. **Install backend dependencies:**
     ```bash
-    cd backend
+    cd functions
     npm install
     ```
-
-3.  **Install frontend dependencies:**
+    
+4. **Login to firebase**
     ```bash
-    cd ../frontend
-    npm install
+    firebase login
+    ```
+   
+5. **Deploy to firebase**
+    ```bash
+    npm start
+    firebase deploy --only functions
     ```
 
-4.  **Set up environment variables:**
-    Create a `.env` file in the `backend` directory and add the necessary environment variables, such as your Firebase credentials.
-
-    ```
-    # .env example
-    FIREBASE_API_KEY=your_api_key
-    FIREBASE_AUTH_DOMAIN=your_auth_domain
-    # ... and so on
-    ```
+    Note: Please run 'npm install' before deployment, otherwise the version before it is modified will be uploaded.
 
 ### Running the application
 
