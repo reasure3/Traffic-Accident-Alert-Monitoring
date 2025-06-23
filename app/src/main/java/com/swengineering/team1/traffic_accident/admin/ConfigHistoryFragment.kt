@@ -50,11 +50,12 @@ class ConfigHistoryFragment : Fragment() {
                     val result = task.result?.data as? List<Map<String, Any>>
                     if (result != null) {
                         val historyList = parseHistory(result)
-                        adapter = ConfigHistoryAdapter(historyList)
+                        adapter = ConfigHistoryAdapter(requireContext(), historyList)
                         recyclerView.adapter = adapter
                     }
                 } else {
-                    Toast.makeText(requireContext(), "Error fetching history: ${task.exception?.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(),
+                        getString(R.string.error_fetching_history, task.exception?.message), Toast.LENGTH_LONG).show()
                     Log.w("ConfigHistory", "Error fetching history", task.exception)
                 }
             }

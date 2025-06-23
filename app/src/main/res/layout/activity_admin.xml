@@ -25,7 +25,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="설정 보기" />
+            android:text="@string/btn_admin_view_settings" />
 
         <Button
             android:id="@+id/btn_history"
@@ -33,6 +33,6 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="기록 보기" />
+            android:text="@string/btn_admin_view_history" />
     </LinearLayout>
 </LinearLayout>

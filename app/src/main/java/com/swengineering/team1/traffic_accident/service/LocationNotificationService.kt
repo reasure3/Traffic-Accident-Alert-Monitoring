@@ -160,10 +160,10 @@ class LocationNotificationService : Service() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 channelId,
-                "위치 기반 알림",
+                getString(R.string.noti_loc_channel_title),
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "특정 위치 도달 시 사용자에게 알림을 보냅니다."
+                description = getString(R.string.noti_loc_channel_desc)
             }
             nm.createNotificationChannel(channel)
         }
@@ -183,14 +183,23 @@ class LocationNotificationService : Service() {
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("근처 위험한 알림")
+            .setContentTitle(getString(R.string.noti_loc_title))
             .setContentText(locationStr)
             .setStyle(
                 NotificationCompat.BigTextStyle()
                     .bigText(
                         "$locationStr\n\n" +
-                                "심각도: $severity\n" +
-                                "좌표: ${location?.latitude}, ${location?.longitude}"
+                                "${
+                                    applicationContext.getString(
+                                        R.string.noti_loc_text_severity,
+                                        severity ?: "null"
+                                    )
+                                }\n" +
+                                applicationContext.getString(
+                                    R.string.noti_loc_text_coord,
+                                    location?.latitude ?: "null",
+                                    location?.longitude ?: "null"
+                                )
                     )
             )
             .setAutoCancel(false)
@@ -243,7 +252,7 @@ class LocationNotificationService : Service() {
 
         if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Log.w("position", "gps is disabled")
-            Toast.makeText(this, "Pleas turn on gps", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.please_turn_gps, Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -297,7 +306,7 @@ class LocationNotificationService : Service() {
             }
         }.addOnFailureListener {
             Log.w("position", "fail to get pos")
-            Toast.makeText(this, "fail to get data", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.fail_get_data, Toast.LENGTH_SHORT).show()
             shouldReQuery = true
         }.addOnSuccessListener {
             Log.d("position", "success to get pos")

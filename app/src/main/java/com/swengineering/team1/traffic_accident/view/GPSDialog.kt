@@ -4,6 +4,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.swengineering.team1.traffic_accident.R
 
 @Composable
 fun ShowGPSDialog(
@@ -12,16 +14,16 @@ fun ShowGPSDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("GPS 비활성화") },
-        text = { Text("GPS 기능이 꺼져 있습니다. 설정에서 활성화하시겠습니까?") },
+        title = { Text(stringResource(R.string.gps_dialog_title)) },
+        text = { Text(stringResource(R.string.gps_dialog_text)) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text("설정으로 이동")
+                Text(stringResource(R.string.gps_dialog_ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("취소")
+                Text(stringResource(R.string.gps_dialog_no))
             }
         }
     )

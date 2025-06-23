@@ -14,14 +14,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import com.swengineering.team1.traffic_accident.R
 
 @Composable
 fun PermissionAwareScreen(
     onPermissionsGranted: @Composable () -> Unit,  // 권한 있을 때 보여줄 화면
     onPermissionsDenied: @Composable (request: () -> Unit) -> Unit,  // 권한 없을 때 보여줄 화면, 버튼 클릭 콜백 파라미터로 전달
     permissions: Array<String>,
-    msgToSetting: String = "권한을 허용해주세요."
+    msgToSetting: String = stringResource(R.string.request_permission_msg_default)
 ) {
     val context = LocalContext.current
 

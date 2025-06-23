@@ -12,7 +12,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Alert Radius (meters)" />
+            android:text="@string/config_title_alert_radius" />
 
         <EditText
             android:id="@+id/radiusEditText"
@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Query Distance Interval (meters)" />
+            android:text="@string/config_title_query_distance_interval" />
 
         <EditText
             android:id="@+id/queryIntervalEditText"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Accident Period (days)" />
+            android:text="@string/config_title_accident_period" />
 
         <EditText
             android:id="@+id/periodEditText"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Minimum Accident Count" />
+            android:text="@string/config_title_min_accident_count" />
 
         <EditText
             android:id="@+id/countEditText"
@@ -59,7 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Min Notification Cooldown (mills)" />
+            android:text="@string/config_title_min_notification_cooldown" />
 
         <EditText
             android:id="@+id/minCooldownEditText"
@@ -71,7 +71,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Max Notification Cooldown (mills)" />
+            android:text="@string/config_title_max_notification_cooldown" />
 
         <EditText
             android:id="@+id/maxCooldownEditText"
@@ -83,7 +83,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Min Severity" />
+            android:text="@string/config_title_min_severity" />
 
         <EditText
             android:id="@+id/minSeverityEditText"
@@ -96,7 +96,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Enable Weather Conditions" />
+            android:text="@string/config_title_enable_weather_condition" />
 
         <Button
             android:id="@+id/saveButton"
@@ -104,7 +104,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="24dp"
-            android:text="Save Changes" />
+            android:text="@string/btn_save_change" />
 
     </LinearLayout>
 </ScrollView> 

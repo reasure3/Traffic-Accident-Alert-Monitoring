@@ -6,4 +6,80 @@
     <string name="label_trends">Trends</string>
     <string name="label_admin_setting">Admin</string>
     <string name="label_license">Licenses</string>
+    <string name="needs_permission_hotstpot">Location permission is required.</string>
+    <string name="needs_permission_notification">Background location and notification permissions are required.</string>
+    <string name="request_permission">Request Permission</string>
+    <string name="request_permission_msg_hotspot">Please allow location permission</string>
+    <string name="request_permission_msg_default">Please allow permission</string>
+    <string name="no_permission_gps">GPS permission is not granted</string>
+    <string name="weak_gps">Unable to retrieve current location due to weak GPS signal</string>
+    <string name="fail_retrieve_location">Failed to retrieve location information</string>
+    <string name="btn_filter">Filter</string>
+    <string name="title_filter">Fiter Settings</string>
+    <string name="filter_severity_title">Accident Severity</string>
+    <string name="filter_weather_title">Weather</string>
+    <string name="filter_weather_fair">Fair</string>
+    <string name="filter_weather_rain">Rain</string>
+    <string name="filter_weather_snow">Snow</string>
+    <string name="filter_weather_cloudy">Cloudy</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="bnt_reset">Reset</string>
+    <string name="gps_dialog_title">GPS is disabled</string>
+    <string name="gps_dialog_text">GPS is turned off. Would you like to enable it in settings?</string>
+    <string name="gps_dialog_ok">" Go to Settings"</string>
+    <string name="gps_dialog_no">Cancel</string>
+    <string name="notification_log_item_severity">Severity: %1$s</string>
+    <string name="notification_log_item_coord">Coordinates: %1$s, %2$s</string>
+    <string name="btn_refresh">Refresh</string>
+    <string name="label_search_place">Search for a place</string>
+    <string name="btn_search">Search</string>
+    <string name="accident_marker_item">Severity: %1$s, Weather: %2$s</string>
+    <string name="filter_weather_error">Error</string>
+    <string name="filter_weather_etc">Etc</string>
+    <string name="searched_marker_item">Searched Location</string>
+    <string name="request_permission_msg_location_always">Please change the location permission to “Allow all the time”</string>
+    <string name="service_is_running">Service Running</string>
+    <string name="service_is_stop">Service Stopped</string>
+    <string name="start_service">Start Service</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="recent_100_logs">Last 100 Records</string>
+    <string name="not_implemented">This feature is not implemented yet.</string>
+    <string name="btn_login">Log In</string>
+    <string name="hide_password">Hide Password</string>
+    <string name="show_password">Show Password</string>
+    <string name="label_email" translatable="false">Email</string>
+    <string name="label_password" translatable="false">Password</string>
+    <string name="hint_email" translatable="false">example@gmail.com</string>
+    <string name="hint_password" translatable="false">password</string>
+    <string name="fail_auth">Authentication failed</string>
+    <string name="please_enter_pw_email">Please enter email and password</string>
+    <string name="config_title_alert_radius" translatable="false">Alert Radius (meters)</string>
+    <string name="config_title_query_distance_interval" translatable="false">Query Distance Interval (meters)</string>
+    <string name="config_title_accident_period" translatable="false">Accident Period (days)</string>
+    <string name="config_title_min_accident_count" translatable="false">Minimum Accident Count</string>
+    <string name="config_title_min_notification_cooldown" translatable="false">Min Notification Cooldown (mills)</string>
+    <string name="config_title_max_notification_cooldown" translatable="false">Max Notification Cooldown (mills)</string>
+    <string name="config_title_min_severity" translatable="false">Min Severity</string>
+    <string name="config_title_enable_weather_condition" translatable="false">Enable Weather Conditions</string>
+    <string name="btn_save_change">Save Changes</string>
+    <string name="btn_admin_view_settings">View Settings</string>
+    <string name="btn_admin_view_history">View History</string>
+    <string name="changed_by">Changed by: %1$s</string>
+    <string name="no_changes">No changes details</string>
+    <string name="error_fetching_history">Error fetching history: %1$s</string>
+    <string name="fail_get_remote_config">Fail to get remote config</string>
+    <string name="please_fill_correctly">Please fill all fields correctly.</string>
+    <string name="changes_saved_successfully">Changes saved successfully!</string>
+    <string name="error_detail">Error: %1$s</string>
+    <string name="noti_background_channel_desc">Notification Channel for background location tracking</string>
+    <string name="traking_noti_title">Traking location</string>
+    <string name="traking_noti_text">The app is monitoring location in the background.</string>
+    <string name="noti_loc_channel_title">Location-based Notification</string>
+    <string name="noti_background_channel_title">Background Location Service</string>
+    <string name="noti_loc_channel_desc">Sends a notification to the user upon reaching a specific location.</string>
+    <string name="noti_loc_title">Nearby Danger Place</string>
+    <string name="noti_loc_text_severity">Severity: %1$s</string>
+    <string name="noti_loc_text_coord">Coordinates: %1$s, %2$s</string>
+    <string name="please_turn_gps">Pleas turn on gps</string>
+    <string name="fail_get_data">Fail to get data</string>
 </resources>

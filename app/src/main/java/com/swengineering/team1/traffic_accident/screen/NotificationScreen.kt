@@ -35,10 +35,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.model.notification.NotificationLogModel
 import com.swengineering.team1.traffic_accident.service.LocationNotificationService
 import com.swengineering.team1.traffic_accident.view.NotificationLogItemView
@@ -56,10 +58,10 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("백그라운드 위치 권한이 필요합니다")
+                Text(stringResource(R.string.needs_permission_notification))
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = requestPermission) {
-                    Text("권한 요청하기")
+                    Text(stringResource(R.string.request_permission))
                 }
             }
         },
@@ -73,7 +75,7 @@ fun NotificationScreen(modifier: Modifier = Modifier) {
                 Manifest.permission.POST_NOTIFICATIONS
             else null
         ).toTypedArray(),
-        msgToSetting = "위치 권한을 항상 허용으로 바꿔주세요."
+        msgToSetting = stringResource(R.string.request_permission_msg_location_always)
     )
 }
 
@@ -110,7 +112,8 @@ private fun LocationServiceController(modifier: Modifier = Modifier, context: Co
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            val label = if (isRunning) "서비스 실행 중" else "서비스 중지됨"
+            val label = if (isRunning) stringResource(R.string.service_is_running)
+            else stringResource(R.string.service_is_stop)
             Icon(
                 imageVector = Icons.Filled.Circle,
                 contentDescription = label,
@@ -135,7 +138,7 @@ private fun LocationServiceController(modifier: Modifier = Modifier, context: Co
             shape = RoundedCornerShape(10.dp),
             contentPadding = PaddingValues(horizontal = 10.dp)
         ) {
-            val label = if (isRunning) "서비스 중지" else "서비스 시작"
+            val label = if (isRunning) stringResource(R.string.stop_service) else stringResource(R.string.start_service)
             Icon(
                 imageVector = if (isRunning) Icons.Filled.Stop else Icons.Filled.PlayArrow,
                 contentDescription = label
@@ -171,10 +174,10 @@ private fun NotificationLogView(modifier: Modifier = Modifier, context: Applicat
         ) {
             Icon(
                 imageVector = Icons.Filled.History,
-                contentDescription = "history icon",
+                contentDescription = stringResource(R.string.recent_100_logs),
             )
             Spacer(Modifier.width(8.dp))
-            Text(text = "최근 100개 기록")
+            Text(text = stringResource(R.string.recent_100_logs))
         }
         Spacer(Modifier.height(16.dp))
         LazyColumn(modifier = Modifier.fillMaxSize()) {

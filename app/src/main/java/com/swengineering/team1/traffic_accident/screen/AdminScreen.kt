@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -34,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.admin.AdminActivity
 
 @Preview
@@ -50,8 +52,8 @@ fun AdminScreen(modifier: Modifier = Modifier) {
         TextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
-            placeholder = { Text("example@gmail.com") },
+            label = { Text(stringResource(R.string.label_email)) },
+            placeholder = { Text(stringResource(R.string.hint_email)) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next
@@ -65,13 +67,14 @@ fun AdminScreen(modifier: Modifier = Modifier) {
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
-            placeholder = { Text("password") },
+            label = { Text(stringResource(R.string.label_password)) },
+            placeholder = { Text(stringResource(R.string.hint_password)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val image =
                     if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                val description = if (passwordVisible) "Hide password" else "Show password"
+                val description = if (passwordVisible) stringResource(R.string.hide_password)
+                else stringResource(R.string.show_password)
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = image, description)
                 }
@@ -85,7 +88,9 @@ fun AdminScreen(modifier: Modifier = Modifier) {
 
         Spacer(Modifier.height(100.dp))
 
-        Button(onClick = { login(context, email, password) }) { Text("로그인") }
+        Button(onClick = { login(context, email, password) }) {
+            Text(stringResource(R.string.btn_login))
+        }
     }
 }
 
@@ -100,10 +105,10 @@ fun login(context: Context, email: String, password: String) {
                     context.startActivity(intent)
                 } else {
                     // If sign in fails, display a message to the user.
-                    Toast.makeText(context, "Authentication failed.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, R.string.fail_auth, Toast.LENGTH_SHORT).show()
                 }
             }
     } else {
-        Toast.makeText(context, "Please enter email and password.", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, R.string.please_enter_pw_email, Toast.LENGTH_SHORT).show()
     }
 }

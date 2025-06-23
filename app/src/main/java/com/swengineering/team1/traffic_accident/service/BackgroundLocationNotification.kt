@@ -13,16 +13,16 @@ import com.swengineering.team1.traffic_accident.R
 
 object BackgroundLocationNotification {
     private const val CHANNEL_ID = "location_service_channel"
-    private const val CHANNEL_NAME = "Background Location Service"
+    private val CHANNEL_NAME = R.string.noti_background_channel_title
 
     fun createNotificationChannel(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                CHANNEL_NAME,
+                context.getString(CHANNEL_NAME),
                 NotificationManager.IMPORTANCE_LOW
             ).apply {
-                description = "백그라운드 위치 감지를 위한 채널"
+                description = context.getString(R.string.noti_background_channel_desc)
             }
             val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             nm.createNotificationChannel(channel)
@@ -40,8 +40,8 @@ object BackgroundLocationNotification {
         )
 
         return NotificationCompat.Builder(context, CHANNEL_ID)
-            .setContentTitle("위치 추적 중")
-            .setContentText("앱이 백그라운드에서 위치를 모니터링하고 있습니다.")
+            .setContentTitle(context.getString(R.string.traking_noti_title))
+            .setContentText(context.getString(R.string.traking_noti_text))
             .setSmallIcon(R.mipmap.ic_launcher_round)
             .setContentIntent(pendingIntent)
             .setOngoing(true) // 사용자가 스와이프하여 알림을 제거하지 못하도록 설정

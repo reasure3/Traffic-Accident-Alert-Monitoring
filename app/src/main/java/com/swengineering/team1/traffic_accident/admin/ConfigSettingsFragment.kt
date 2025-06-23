@@ -62,7 +62,7 @@ class ConfigSettingsFragment : Fragment() {
     private fun displayCurrentConfig() {
         configRepository.fetchRemoteConfig(
             onFail = {
-                Toast.makeText(context, "Fail to get remote config", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, R.string.fail_get_remote_config, Toast.LENGTH_SHORT).show()
             }
         ) {
             val config = configRepository.getNotificationConfig()
@@ -106,7 +106,7 @@ class ConfigSettingsFragment : Fragment() {
         if (newValues.values.any { (it as? Int ?: 1) <= 0 } && newValues.size < 5) {
             Toast.makeText(
                 requireContext(),
-                "Please fill all fields correctly.",
+                R.string.please_fill_correctly,
                 Toast.LENGTH_SHORT
             ).show()
             return
@@ -121,13 +121,13 @@ class ConfigSettingsFragment : Fragment() {
                 if (task.isSuccessful) {
                     Toast.makeText(
                         requireContext(),
-                        "Changes saved successfully!",
+                        R.string.changes_saved_successfully,
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
                     Toast.makeText(
                         requireContext(),
-                        "Error: ${task.exception?.message}",
+                        getString(R.string.error_detail, task.exception?.message),
                         Toast.LENGTH_LONG
                     ).show()
                     Log.w("updateConfigAndLog", "Error UpdateConfigAndLog", task.exception)

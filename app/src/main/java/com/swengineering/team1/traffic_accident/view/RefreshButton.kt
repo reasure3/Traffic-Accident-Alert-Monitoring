@@ -7,7 +7,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.swengineering.team1.traffic_accident.R
 
 @Composable
 fun RefreshButtonView(
@@ -21,7 +23,7 @@ fun RefreshButtonView(
     ) {
         Icon(
             imageVector = Icons.Default.Refresh,
-            contentDescription = "새로 고침"
+            contentDescription = stringResource(R.string.btn_refresh)
         )
     }
 }

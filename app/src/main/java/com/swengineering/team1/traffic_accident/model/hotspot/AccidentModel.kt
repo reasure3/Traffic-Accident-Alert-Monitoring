@@ -9,6 +9,7 @@ import com.google.common.primitives.Doubles.min
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
+import com.swengineering.team1.traffic_accident.R
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -71,19 +72,20 @@ object AccidentModel {
 
                         Log.d("AccidentModel", "문서 weather: $weatherRaw")
                         val weather = when {
-                            weatherRaw == null -> ""
-                            "rain" in weatherRaw -> "비"
-                            "snow" in weatherRaw -> "눈"
-                            "cloudy" in weatherRaw -> "흐림"
-                            "fair" in weatherRaw -> "맑음"
-                            else -> ""
+                            weatherRaw == null -> "" to R.string.filter_weather_error
+                            "rain" in weatherRaw -> "rain" to R.string.filter_weather_rain
+                            "snow" in weatherRaw -> "snow" to R.string.filter_weather_snow
+                            "cloudy" in weatherRaw -> "cloudy" to R.string.filter_weather_cloudy
+                            "fair" in weatherRaw -> "fair" to R.string.filter_weather_fair
+                            else -> "" to R.string.filter_weather_etc
                         }
 
                         loadedItem.add(
                             AccidentItem(
                                 id = doc.id,
                                 severity = severity,
-                                weather = weather,
+                                weather = weather.first,
+                                weatherId = weather.second,
                                 latitude = lat.toString(),
                                 longitude = lng.toString()
                             )

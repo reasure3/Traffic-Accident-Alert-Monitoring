@@ -12,7 +12,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.model.hotspot.MapFilter
 
 @Composable
@@ -25,10 +29,10 @@ fun FilterDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("필터 설정") },
+        title = { Text(stringResource(R.string.title_filter)) },
         text = {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text("사고 심각도")
+                Text(stringResource(R.string.filter_severity_title))
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     (1..4).forEach { level ->
@@ -44,16 +48,37 @@ fun FilterDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text("날씨")
+                Text(stringResource(R.string.filter_weather_title))
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("맑음", "비", "눈", "흐림").forEach { weather ->
+                    listOf(
+                        "fair" to stringResource(R.string.filter_weather_fair),
+                        "rain" to stringResource(R.string.filter_weather_rain),
+                        "snow" to stringResource(R.string.filter_weather_snow),
+                        "cloudy" to stringResource(R.string.filter_weather_cloudy),
+                    ).forEach { weather ->
                         FilterChip(
-                            selected = filter.weatherList.contains(weather),
+                            selected = filter.weatherList.contains(weather.first),
                             onClick = {
-                                onToggleWeather(weather)
+                                onToggleWeather(weather.first)
                             },
-                            label = { Text(weather) }
+                            label = {
+                                val text = weather.second
+
+                                // 글자 길이에 따라 폰트 크기 조절 (예시: 글자 수 기준으로 줄이기)
+                                val fontSize = when {
+                                    text.length <= 4 -> 14.sp
+                                    text.length <= 8 -> 10.sp
+                                    else -> 6.sp
+                                }
+
+                                Text(
+                                    text = text,
+                                    fontSize = fontSize,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
                         )
                     }
                 }
@@ -61,12 +86,12 @@ fun FilterDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("확인")
+                Text(stringResource(R.string.btn_confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onReset) {
-                Text("초기화")
+                Text(stringResource(R.string.bnt_reset))
             }
         }
     )

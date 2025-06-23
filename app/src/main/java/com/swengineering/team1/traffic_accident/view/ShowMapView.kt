@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.GoogleMap
@@ -13,6 +14,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.model.hotspot.AccidentItem
 
 @SuppressLint("MissingPermission")
@@ -29,14 +31,17 @@ fun ShowMapView(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            uiSettings = MapUiSettings(myLocationButtonEnabled = false, zoomControlsEnabled = false),
+            uiSettings = MapUiSettings(
+                myLocationButtonEnabled = false,
+                zoomControlsEnabled = false
+            ),
             properties = MapProperties(isMyLocationEnabled = true),
             onMapLoaded = onMapLoaded
         ) {
             selectedLocation?.let {
                 Marker(
                     state = MarkerState(position = it),
-                    title = "검색 위치"
+                    title = stringResource(R.string.searched_marker_item)
                 )
             }
             accidents.forEach { accident ->
@@ -45,9 +50,14 @@ fun ShowMapView(
                 if (lat != null && lng != null) {
                     Marker(
                         state = MarkerState(
-                            position = LatLng(lat, lng)),
+                            position = LatLng(lat, lng)
+                        ),
                         title = "${lat}, ${lng}",
-                        snippet = "심각도: ${accident.severity}, 날씨: ${accident.weather}"
+                        snippet = stringResource(
+                            R.string.accident_marker_item,
+                            accident.severity,
+                            stringResource(accident.weatherId)
+                        )
                     )
                 }
             }

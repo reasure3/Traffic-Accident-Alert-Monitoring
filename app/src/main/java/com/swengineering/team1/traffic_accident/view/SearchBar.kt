@@ -12,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import com.swengineering.team1.traffic_accident.R
 
 @Composable
 fun SearchBar(
@@ -32,7 +34,7 @@ fun SearchBar(
     OutlinedTextField(
         value = searchText,
         onValueChange = onSearchTextChanged,
-        label = { Text("장소를 검색하세요") },
+        label = { Text(stringResource(R.string.label_search_place)) },
         modifier = Modifier.fillMaxWidth(),
         singleLine = true,
         maxLines = 1,
@@ -52,7 +54,7 @@ fun SearchBar(
                 onSearchTriggered()
                 focusManager.clearFocus()
             }) {
-                Text("검색")
+                Text(stringResource(R.string.btn_search))
             }
         }
     )

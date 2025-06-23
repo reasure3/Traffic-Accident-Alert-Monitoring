@@ -28,6 +28,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,7 @@ import com.firebase.geofire.GeoLocation
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.hotspot.LocationError
 import com.swengineering.team1.traffic_accident.hotspot.LocationService
 import com.swengineering.team1.traffic_accident.hotspot.MapSearchController
@@ -66,10 +68,10 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("위치 권한이 필요합니다")
+                Text(stringResource(R.string.needs_permission_hotstpot))
                 Spacer(Modifier.height(8.dp))
                 Button(onClick = requestPermission) {
-                    Text("권한 요청하기")
+                    Text(stringResource(R.string.request_permission))
                 }
             }
         },
@@ -77,7 +79,7 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION
         ),
-        msgToSetting = "위치 권한을 허용해주세요"
+        msgToSetting = stringResource(R.string.request_permission_msg_hotspot)
     )
 }
 
@@ -110,11 +112,11 @@ fun InnerHotspotScreen() {
             )
             MapLocationModel.setInitialLocation(location)
         } catch (_: LocationError.PermissionDenied) {
-            Toast.makeText(context, "GPS 권한이 없습니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.no_permission_gps, Toast.LENGTH_SHORT).show()
         } catch (_: LocationError.GpsSignalWeak) {
-            Toast.makeText(context, "GPS 신호가 약해서 현재 위치를 불러올 수 없습니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.weak_gps, Toast.LENGTH_SHORT).show()
         } catch (_: Exception) {
-            Toast.makeText(context, "위치 정보를 불러오지 못했습니다", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.fail_retrieve_location, Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -208,13 +210,17 @@ fun InnerHotspotScreen() {
                                 update = CameraUpdateFactory.newLatLngZoom(location, 17f),
                                 durationMs = 1000
                             )
-                        } catch (_: LocationError.GpsSignalWeak) {
-                            Toast.makeText(context, "GPS 신호가 약합니다", Toast.LENGTH_SHORT).show()
                         } catch (_: LocationError.PermissionDenied) {
-                            Toast.makeText(context, "GPS 권한이 없습니다", Toast.LENGTH_SHORT).show()
-                        } catch (_: Exception) {
-                            Toast.makeText(context, "위치 정보를 불러오는 데 실패했습니다", Toast.LENGTH_SHORT)
+                            Toast.makeText(context, R.string.no_permission_gps, Toast.LENGTH_SHORT)
                                 .show()
+                        } catch (_: LocationError.GpsSignalWeak) {
+                            Toast.makeText(context, R.string.weak_gps, Toast.LENGTH_SHORT).show()
+                        } catch (_: Exception) {
+                            Toast.makeText(
+                                context,
+                                R.string.fail_retrieve_location,
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
                     }
                 },
