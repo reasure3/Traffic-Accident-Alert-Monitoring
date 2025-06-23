@@ -40,33 +40,21 @@ The main features of this project are:
     cd functions
     npm install
     ```
-    
-4. **Login to firebase**
+
+### Deploy the functions to firebase
+
+1. **Login to firebase**
     ```bash
     firebase login
     ```
-   
-5. **Deploy to firebase**
+
+2. **Deploy to firebase**
     ```bash
     npm start
     firebase deploy --only functions
     ```
 
-    Note: Please run 'npm install' before deployment, otherwise the version before it is modified will be uploaded.
-
-### Running the application
-
-1.  **Start the backend server:**
-    ```bash
-    cd backend
-    npm start
-    ```
-
-2.  **Start the frontend development server:**
-    ```bash
-    cd ../frontend
-    npm start
-    ```
+   Note: Please run 'npm install' before deployment, otherwise the version before it is modified will be uploaded.
 
 # 교통사고 알림 및 분석 시스템
 
