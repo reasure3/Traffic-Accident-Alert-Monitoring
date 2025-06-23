@@ -1,12 +1,9 @@
 package com.swengineering.team1.traffic_accident.view
 
-import android.content.Context
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import android.content.Intent
-import android.provider.Settings
 
 @Composable
 fun ShowGPSDialog(

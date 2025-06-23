@@ -1,7 +1,5 @@
 package com.swengineering.team1.traffic_accident
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,8 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.FirebaseApp
 import com.swengineering.team1.traffic_accident.nav.NavBar

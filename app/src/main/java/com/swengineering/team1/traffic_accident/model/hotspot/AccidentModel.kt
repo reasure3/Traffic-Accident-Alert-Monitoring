@@ -12,7 +12,6 @@ import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlin.collections.get
 import kotlin.math.cos
 import kotlin.math.pow
 
