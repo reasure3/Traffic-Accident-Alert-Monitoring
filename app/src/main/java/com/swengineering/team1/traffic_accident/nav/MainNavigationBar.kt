@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.LibraryBooks
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -15,7 +17,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -75,7 +76,7 @@ fun NavBar(navController: NavController) {
         NavigationBarItem(
             icon = {
                 Icon(
-                    painter = painterResource(R.drawable.ic_library),
+                    imageVector = Icons.AutoMirrored.Filled.LibraryBooks,
                     contentDescription = stringResource(R.string.label_license),
                     modifier = Modifier
                         .width(26.dp)
@@ -98,9 +99,8 @@ fun NavBar(navController: NavController) {
 fun RowScope.NavItem(navController: NavController, screen: ScreenType, selected: Boolean) {
     NavigationBarItem(
         icon = {
-            val iconId = if (selected) screen.selectedIcon else screen.unselectedIcon
             Icon(
-                painter = painterResource(iconId),
+                imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
                 contentDescription = stringResource(screen.title),
                 modifier = Modifier
                     .width(26.dp)

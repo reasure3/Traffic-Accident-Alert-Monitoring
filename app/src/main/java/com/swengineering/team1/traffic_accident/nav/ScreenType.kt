@@ -1,5 +1,15 @@
 package com.swengineering.team1.traffic_accident.nav
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AdminPanelSettings
+import androidx.compose.material.icons.filled.InsertChart
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.InsertChartOutlined
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.swengineering.team1.traffic_accident.R
 
 /**
@@ -8,34 +18,34 @@ import com.swengineering.team1.traffic_accident.R
 enum class ScreenType(
     val route: String,
     val title: Int,
-    val selectedIcon: Int,
-    val unselectedIcon: Int
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
 ) {
     Hotspot(
         "hotspot",
         R.string.label_hotspot,
-        R.drawable.ic_hotspot_filled,
-        R.drawable.ic_hotspot_outline
+        Icons.Filled.LocationOn,
+        Icons.Outlined.LocationOn
     ),
 
     Notification(
         "notification",
         R.string.label_notification,
-        R.drawable.ic_notification_filled,
-        R.drawable.ic_notification_outline
+        Icons.Filled.Notifications,
+        Icons.Outlined.Notifications
     ),
 
     Trends(
         "trends",
         R.string.label_trends,
-        R.drawable.ic_chart_filled,
-        R.drawable.ic_chart_outline
+        Icons.Filled.InsertChart,
+        Icons.Outlined.InsertChartOutlined
     ),
 
     Admin(
         "admin",
         R.string.label_admin_setting,
-        R.drawable.ic_admin_filled,
-        R.drawable.ic_admin_outline
+        Icons.Filled.AdminPanelSettings,
+        Icons.Outlined.AdminPanelSettings
     )
 }

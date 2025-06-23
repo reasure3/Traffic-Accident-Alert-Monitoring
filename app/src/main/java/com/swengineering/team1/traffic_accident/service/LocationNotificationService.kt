@@ -165,7 +165,7 @@ class LocationNotificationService : Service() {
         )
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setSmallIcon(R.drawable.ic_hotspot_filled)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("위치 알림")
             .setContentText("위험한 위치: (${location.latitude}, ${location.longitude})")
             .setAutoCancel(false)

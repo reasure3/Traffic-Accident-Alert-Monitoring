@@ -42,7 +42,7 @@ object BackgroundLocationNotification {
         return NotificationCompat.Builder(context, CHANNEL_ID)
             .setContentTitle("위치 추적 중")
             .setContentText("앱이 백그라운드에서 위치를 모니터링하고 있습니다.")
-            .setSmallIcon(R.drawable.ic_hotspot_filled) // 적절한 아이콘 리소스 지정
+            .setSmallIcon(R.mipmap.ic_launcher_round)
             .setContentIntent(pendingIntent)
             .setOngoing(true) // 사용자가 스와이프하여 알림을 제거하지 못하도록 설정
             .build()
