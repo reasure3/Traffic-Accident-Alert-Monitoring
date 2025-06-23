@@ -35,13 +35,13 @@ import com.firebase.geofire.GeoLocation
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.swengineering.team1.traffic_accident.model.AccidentModel
-import com.swengineering.team1.traffic_accident.model.MapFilterModel
-import com.swengineering.team1.traffic_accident.model.MapLocationModel
-import com.swengineering.team1.traffic_accident.screen.util.PermissionAwareScreen
-import com.swengineering.team1.traffic_accident.service.LocationError
-import com.swengineering.team1.traffic_accident.service.LocationService
-import com.swengineering.team1.traffic_accident.service.MapSearchService
+import com.swengineering.team1.traffic_accident.model.hotspot.AccidentModel
+import com.swengineering.team1.traffic_accident.model.hotspot.MapFilterModel
+import com.swengineering.team1.traffic_accident.model.hotspot.MapLocationModel
+import com.swengineering.team1.traffic_accident.view.PermissionAwareScreen
+import com.swengineering.team1.traffic_accident.hotspot.LocationError
+import com.swengineering.team1.traffic_accident.hotspot.LocationService
+import com.swengineering.team1.traffic_accident.hotspot.MapSearchController
 import com.swengineering.team1.traffic_accident.view.AccidentFilterPanel
 import com.swengineering.team1.traffic_accident.view.FilterDialog
 import com.swengineering.team1.traffic_accident.view.SearchBar
@@ -58,7 +58,7 @@ import kotlinx.coroutines.launch
 fun HotspotScreen(modifier: Modifier = Modifier) {
     PermissionAwareScreen(
         onPermissionsGranted = {
-            InnerHotspotScreen(modifier)
+            InnerHotspotScreen()
         },
         onPermissionsDenied = { requestPermission ->
             Column(
@@ -82,7 +82,7 @@ fun HotspotScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun InnerHotspotScreen(modifier: Modifier = Modifier) {
+fun InnerHotspotScreen() {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
@@ -181,7 +181,7 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
                 SearchBarController(
                     onSearch = { query ->
                         coroutineScope.launch {
-                            val latLng = MapSearchService.searchLocation(context, query)
+                            val latLng = MapSearchController.searchLocation(context, query)
                             latLng?.let { MapLocationModel.setSelectedLocation(it) }
                         }
                     }

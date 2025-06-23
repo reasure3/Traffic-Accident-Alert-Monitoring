@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.swengineering.team1.traffic_accident.R
-import com.swengineering.team1.traffic_accident.models.ConfigChangeHistory
+import com.swengineering.team1.traffic_accident.model.remote_config.ConfigChangeHistory
 import java.text.SimpleDateFormat
 import java.util.Locale
 

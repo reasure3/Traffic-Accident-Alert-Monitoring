@@ -13,7 +13,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
-import com.swengineering.team1.traffic_accident.model.AccidentItem
+import com.swengineering.team1.traffic_accident.model.hotspot.AccidentItem
 
 @SuppressLint("MissingPermission")
 @Composable

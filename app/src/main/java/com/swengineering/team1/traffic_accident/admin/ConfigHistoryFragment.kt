@@ -13,9 +13,10 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.functions.ktx.functions
 import com.google.firebase.ktx.Firebase
 import com.swengineering.team1.traffic_accident.R
-import com.swengineering.team1.traffic_accident.models.ConfigChangeHistory
+import com.swengineering.team1.traffic_accident.model.remote_config.ConfigChangeHistory
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.TimeZone
 
 class ConfigHistoryFragment : Fragment() {
@@ -61,7 +62,7 @@ class ConfigHistoryFragment : Fragment() {
 
     private fun parseHistory(data: List<Map<String, Any>>): List<ConfigChangeHistory> {
         val historyList = mutableListOf<ConfigChangeHistory>()
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
         sdf.timeZone = TimeZone.getTimeZone("UTC")
 
         for (item in data) {

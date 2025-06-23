@@ -35,7 +35,7 @@ import com.swengineering.team1.traffic_accident.config.ConfigRepository
 import com.swengineering.team1.traffic_accident.model.AppLocalDatabase
 import com.swengineering.team1.traffic_accident.model.notification.NotificationLogDao
 import com.swengineering.team1.traffic_accident.model.notification.NotificationLogItem
-import com.swengineering.team1.traffic_accident.models.NotificationConfig
+import com.swengineering.team1.traffic_accident.model.remote_config.NotificationConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

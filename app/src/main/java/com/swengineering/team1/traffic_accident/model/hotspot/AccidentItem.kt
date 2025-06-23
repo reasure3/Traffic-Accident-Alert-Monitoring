@@ -1,4 +1,4 @@
-package com.swengineering.team1.traffic_accident.model
+package com.swengineering.team1.traffic_accident.model.hotspot
 
 data class AccidentItem(
     val id: String,

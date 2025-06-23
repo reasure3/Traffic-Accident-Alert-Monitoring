@@ -8,7 +8,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.swengineering.team1.traffic_accident.model.MapFilter
+import com.swengineering.team1.traffic_accident.model.hotspot.MapFilter
 
 @Composable
 fun FilterDialog(

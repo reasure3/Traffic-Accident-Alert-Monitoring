@@ -15,7 +15,7 @@ import com.google.firebase.ktx.Firebase
 import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.config.ConfigConstants
 import com.swengineering.team1.traffic_accident.config.ConfigRepository
-import com.swengineering.team1.traffic_accident.models.NotificationConfig
+import com.swengineering.team1.traffic_accident.model.remote_config.NotificationConfig
 
 class ConfigSettingsFragment : Fragment() {
 

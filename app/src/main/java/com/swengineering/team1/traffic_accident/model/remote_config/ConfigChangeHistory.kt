@@ -1,4 +1,4 @@
-package com.swengineering.team1.traffic_accident.models
+package com.swengineering.team1.traffic_accident.model.remote_config
 
 import java.util.Date
 

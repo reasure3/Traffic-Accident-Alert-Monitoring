@@ -1,4 +1,4 @@
-package com.swengineering.team1.traffic_accident.service
+package com.swengineering.team1.traffic_accident.hotspot
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,9 +11,17 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 sealed class LocationError : Exception() {
-    object GpsSignalWeak : LocationError()
-    object PermissionDenied : LocationError()
-    object GpsDisabled : LocationError()
+    object GpsSignalWeak : LocationError() {
+        private fun readResolve(): Any = GpsSignalWeak
+    }
+
+    object PermissionDenied : LocationError() {
+        private fun readResolve(): Any = PermissionDenied
+    }
+
+    object GpsDisabled : LocationError() {
+        private fun readResolve(): Any = GpsDisabled
+    }
 }
 
 object LocationService {
@@ -39,7 +47,7 @@ object LocationService {
                     .addOnFailureListener { e ->
                         continuation.resumeWithException(e)
                     }
-            } catch (e: SecurityException) {
+            } catch (_: SecurityException) {
                 continuation.resumeWithException(LocationError.PermissionDenied)
             }
         }

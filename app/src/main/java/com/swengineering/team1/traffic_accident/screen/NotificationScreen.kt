@@ -40,7 +40,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.swengineering.team1.traffic_accident.model.notification.NotificationLogModel
-import com.swengineering.team1.traffic_accident.screen.util.PermissionAwareScreen
+import com.swengineering.team1.traffic_accident.view.PermissionAwareScreen
 import com.swengineering.team1.traffic_accident.service.LocationNotificationService
 import com.swengineering.team1.traffic_accident.view.NotificationLogItemView
 

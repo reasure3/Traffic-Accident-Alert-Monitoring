@@ -1,4 +1,4 @@
-package com.swengineering.team1.traffic_accident.screen.util
+package com.swengineering.team1.traffic_accident.view
 
 import android.content.Intent
 import android.content.pm.PackageManager

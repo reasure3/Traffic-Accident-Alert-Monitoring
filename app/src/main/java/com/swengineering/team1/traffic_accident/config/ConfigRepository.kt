@@ -5,7 +5,7 @@ import com.google.firebase.ktx.Firebase
 import com.google.firebase.remoteconfig.ktx.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.swengineering.team1.traffic_accident.R
-import com.swengineering.team1.traffic_accident.models.NotificationConfig
+import com.swengineering.team1.traffic_accident.model.remote_config.NotificationConfig
 
 class ConfigRepository private constructor() {
     private val remoteConfig = Firebase.remoteConfig.apply {

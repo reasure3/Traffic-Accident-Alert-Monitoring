@@ -1,4 +1,4 @@
-package com.swengineering.team1.traffic_accident.model
+package com.swengineering.team1.traffic_accident.model.hotspot
 
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.MutableStateFlow
