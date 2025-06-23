@@ -28,15 +28,21 @@ import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.QuerySnapshot
 import com.swengineering.team1.traffic_accident.MainActivity
 import com.swengineering.team1.traffic_accident.R
 import com.swengineering.team1.traffic_accident.config.ConfigRepository
+import com.swengineering.team1.traffic_accident.model.AppLocalDatabase
+import com.swengineering.team1.traffic_accident.model.notification.NotificationLogDao
+import com.swengineering.team1.traffic_accident.model.notification.NotificationLogItem
 import com.swengineering.team1.traffic_accident.models.NotificationConfig
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+import java.util.Date
 
 class LocationNotificationService : Service() {
 
@@ -45,8 +51,10 @@ class LocationNotificationService : Service() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationCallback: LocationCallback
     private lateinit var locationManager: LocationManager
-    private var dbCollection: CollectionReference? = null
+    private var fireDBCollection: CollectionReference? = null
     private var isQuerying = false
+
+    private lateinit var localDao: NotificationLogDao
 
     private var lastQueryLoc: GeoLocation? = null
     private var shouldReQuery: Boolean = false
@@ -80,8 +88,9 @@ class LocationNotificationService : Service() {
             }
         }
 
-        val db = FirebaseFirestore.getInstance("traffic-data")
-        dbCollection = db.collection("accident")
+        val fireDB = FirebaseFirestore.getInstance("traffic-data")
+        fireDBCollection = fireDB.collection("accident")
+
         _isRunning.value = true
     }
 
@@ -100,6 +109,9 @@ class LocationNotificationService : Service() {
 
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
 
+        val localDB = AppLocalDatabase.getInstance(applicationContext)
+        localDao = localDB.notificationLogDao()
+
         // 서비스가 강제 종료되어도 다시 재시작을 원하면 START_STICKY
         return START_STICKY
     }
@@ -107,7 +119,7 @@ class LocationNotificationService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopLocationUpdates()
-        dbCollection = null
+        fireDBCollection = null
         _isRunning.value = false
     }
 
@@ -139,7 +151,7 @@ class LocationNotificationService : Service() {
     }
 
     // 알림 전송 로직
-    private fun sendLocationNotification(location: GeoPoint) {
+    private fun sendLocationNotification(doc: DocumentSnapshot) {
         val nm = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
         val notifyId = System.currentTimeMillis().toInt()
@@ -164,10 +176,23 @@ class LocationNotificationService : Service() {
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
+        val location = doc.getGeoPoint("position.start_pos")
+        val locationStr = "${doc.getString("info.street")}, ${doc.getString("info.city")}, " +
+                "${doc.getString("info.state")}, ${doc.getString("info.country")}"
+        val severity = doc.getDouble("severity")?.toInt()
+
         val notification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("위치 알림")
-            .setContentText("위험한 위치: (${location.latitude}, ${location.longitude})")
+            .setContentTitle("근처 위험한 알림")
+            .setContentText(locationStr)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(
+                        "$locationStr\n\n" +
+                                "심각도: $severity\n" +
+                                "좌표: ${location?.latitude}, ${location?.longitude}"
+                    )
+            )
             .setAutoCancel(false)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setContentIntent(pendingIntent)
@@ -177,10 +202,28 @@ class LocationNotificationService : Service() {
         nm.notify(notifyId, notification)
     }
 
+    private fun storeNotification(doc: DocumentSnapshot) {
+        val log = NotificationLogItem(
+            timestamp = Date(),
+            location = doc.getGeoPoint("position.start_pos"),
+            severity = doc.getDouble("severity")?.toInt() ?: 0,
+            country = doc.getString("info.country") ?: "",
+            state = doc.getString("info.state") ?: "",
+            city = doc.getString("info.city") ?: "",
+            street = doc.getString("info.street") ?: "",
+        )
+
+        Log.d("position", "start save log")
+        CoroutineScope(Dispatchers.IO).launch {
+            localDao.insert(log)
+            Log.d("position", "finish save log")
+        }
+    }
+
     private fun checkLocationNotification(location: Location) {
         if (isQuerying) return
 
-        if (dbCollection == null) {
+        if (fireDBCollection == null) {
             isQuerying = false
             return
         }
@@ -213,7 +256,7 @@ class LocationNotificationService : Service() {
         Log.d("position", "bounds size: ${bounds.size}")
         val tasks: MutableList<Task<QuerySnapshot>> = ArrayList()
         bounds.forEach {
-            val q = dbCollection!!
+            val q = fireDBCollection!!
                 .orderBy("position.start_hash")
                 .startAt(it.startHash)
                 .endAt(it.endHash)
@@ -247,9 +290,10 @@ class LocationNotificationService : Service() {
                 }
             }
 
-            minDistDoc?.getGeoPoint("position.start_pos")?.let { pos ->
+            minDistDoc?.let { doc ->
                 Log.d("position", "send notification")
-                sendLocationNotification(pos)
+                sendLocationNotification(doc)
+                storeNotification(doc)
             }
         }.addOnFailureListener {
             Log.w("position", "fail to get pos")

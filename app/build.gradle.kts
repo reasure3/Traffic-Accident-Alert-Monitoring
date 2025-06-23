@@ -8,6 +8,7 @@ plugins {
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
     id("com.google.android.gms.oss-licenses-plugin")
     id("com.github.jk1.dependency-license-report") version "2.9"
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -63,6 +64,9 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.navigation.compose)

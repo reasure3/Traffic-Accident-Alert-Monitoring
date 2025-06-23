@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.compose) apply false
     id("com.google.gms.google-services") version "4.4.2" apply false
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin") version "2.0.1" apply false
+    id("com.google.devtools.ksp") version "2.0.21-1.0.27" apply false
 }
 
 buildscript {
@@ -12,8 +13,8 @@ buildscript {
         google()
     }
     dependencies {
-        classpath("com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1")
-        classpath("com.google.android.gms:oss-licenses-plugin:0.10.6")
-        classpath("com.google.gms:google-services:4.4.2")
+        classpath(libs.secrets.gradle.plugin)
+        classpath(libs.oss.licenses.plugin)
+        classpath(libs.google.services)
     }
 }
