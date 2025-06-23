@@ -109,11 +109,11 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
                 CameraUpdateFactory.newLatLngZoom(location, 17f)
             )
             MapLocationModel.setInitialLocation(location)
-        } catch (e: LocationError.PermissionDenied) {
+        } catch (_: LocationError.PermissionDenied) {
             Toast.makeText(context, "GPS 권한이 없습니다", Toast.LENGTH_SHORT).show()
-        } catch (e: LocationError.GpsSignalWeak) {
+        } catch (_: LocationError.GpsSignalWeak) {
             Toast.makeText(context, "GPS 신호가 약해서 현재 위치를 불러올 수 없습니다", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Toast.makeText(context, "위치 정보를 불러오지 못했습니다", Toast.LENGTH_SHORT).show()
         }
 
@@ -208,17 +208,22 @@ fun InnerHotspotScreen(modifier: Modifier = Modifier) {
                                 update = CameraUpdateFactory.newLatLngZoom(location, 17f),
                                 durationMs = 1000
                             )
-                        } catch (e: LocationError.GpsSignalWeak) {
+                        } catch (_: LocationError.GpsSignalWeak) {
                             Toast.makeText(context, "GPS 신호가 약합니다", Toast.LENGTH_SHORT).show()
-                        } catch (e: LocationError.PermissionDenied) {
+                        } catch (_: LocationError.PermissionDenied) {
                             Toast.makeText(context, "GPS 권한이 없습니다", Toast.LENGTH_SHORT).show()
-                        } catch (e: Exception) {
+                        } catch (_: Exception) {
                             Toast.makeText(context, "위치 정보를 불러오는 데 실패했습니다", Toast.LENGTH_SHORT)
                                 .show()
                         }
                     }
                 },
                 onMapLoaded = {
+                    val latLng = cameraPositionState.position.target
+                    val loc = GeoLocation(latLng.latitude, latLng.longitude)
+                    AccidentModel.loadAccidents(loc, cameraPositionState.position.zoom)
+                },
+                onRefreshClick = {
                     val latLng = cameraPositionState.position.target
                     val loc = GeoLocation(latLng.latitude, latLng.longitude)
                     AccidentModel.loadAccidents(loc, cameraPositionState.position.zoom)
